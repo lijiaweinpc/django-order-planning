@@ -1,0 +1,575 @@
+html,body{
+  width:100%;
+  height: 100%;
+}
+.PCIDetails .fileInput{
+  width:300px;
+  display:inline-block;
+}
+.PCIDetails .fileTip{
+  color: #737373;
+  font-weight: inherit;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.PCIDetails .btn-primary{
+  width: 120px;
+  margin-top: 30px;
+}
+.PCIDetails .excel_data{
+  display: none;
+}
+.PCIDetails .resultTab{
+  margin-top: 50px;
+  display: none;
+}
+.PCIDetails .panel-default{
+  overflow: auto;
+}
+
+.pciDetail .panel-default .text-mute{
+  margin-left: 10px;
+  margin-right: 20px;
+}
+.pciDetail .panel-default .label-info{
+  margin-right: 5px;
+}
+.PCIDetails .tipCon{
+  display: none;
+}
+.pciDetail .chassis{
+  max-width: 100px;
+  display: block;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.PCIDetails .maxWidth{
+  max-width:150px;
+  display: block;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.PCIDetails .aLink a{
+  width: 150px;
+  display: block;
+}
+.PCIDetails .resultBab .aLink a {
+  width: 50px;
+  display: block;
+}
+.PCIDetails .resultBab .isfinal0{
+  color: #CCC;
+}
+.PCIDetails .resultBab .borderR{
+  border-right: 1px solid #ddd;
+}
+.PCIDetails .resultBab .suggest{
+  color: #ff6400;
+  margin-left: 10px;
+}
+.PCIDetails .resultBabAll p,.pciDetail table p{
+  margin:0;
+  line-height: initial;
+}
+.PCIDetails .resultBabAll tbody tr td:last-child p,.pciDetail .initTab tbody tr td:last-child p,.pciDetail .tabAll tbody tr td:last-child p{
+  width:100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: box;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  height: 50px;
+}
+.PCIDetails .form-group{
+  display: inline-block;
+  margin-left: 20px;
+  min-width: 240px;
+}
+.PCIDetails .form-group .labelText{
+  position: relative;
+  height: 34px;
+  float: left;
+  vertical-align: middle;
+  line-height: 34px;
+  margin-right: 10px;
+  width: 70px;
+  text-align: right;
+}
+
+.PCIDetails.details2 .title{
+  font-size: 16px;
+  float: left;
+  border-right: 1px solid #ddd;
+  width: 52px;
+  line-height: 20px;
+  margin: 0;
+  margin-top: 21px;
+}
+.PCIDetails.details2 .groupList{
+  float: left;
+}
+.PCIDetails.details2 .groupList .form-group,.PCIDetails.details2 .yingCon .form-group{
+  margin-left:0;
+}
+/* .PCIDetails.details2 .cpuCon,.PCIDetails.details2 .leiCon{
+  float: left;
+} */
+/* .PCIDetails.details2 .leiCon{
+  margin-left: 50px;
+} */
+/* .PCIDetails.details2 .cpuCon{
+  width: 548px;
+} */
+/* .PCIDetails.details2 .yingCon,.PCIDetails.details2 .tuiCon{
+  float: left;
+} */
+.PCIDetails.details2 .tuiCon{
+  margin-left: 44px;
+}
+.PCIDetails.details2 .tuiCon .form-group.group{
+  min-width: 775px;
+}
+.PCIDetails.details2 .tuiCon .form-group.group .form-group{
+  margin:0;
+}
+.PCIDetails.details2 .btn-primary{
+  margin-top: -6px;
+  margin-left: 20px;
+}
+.PCIDetails.details2 .projectCon .groupList{
+  margin-left: 52px;
+}
+.PCIDetails.details2 .projectCon .groupList .groupD:nth-child(1){
+  width: 240px;
+}
+.PCIDetails.details2 .projectCon .groupList .groupD:nth-child(2){
+  width: 200px;
+}
+.PCIDetails.details2 .fileInput{
+  width: 160px;
+}
+.PCIDetails.details2 .leiCon .form-group{
+  margin-left: 0;
+}
+.PCIDetails.details2 .resultTab{
+  display: none;
+  margin-bottom: 50px;
+}
+.PCIDetails.details2 .titleTr{
+  background-color: #ff640026;
+}
+.PCIDetails.details2 .resultTab .panel-heading{
+  text-align: center;
+}
+.PCIDetails.details2 .price,.PCIDetails.details2 .lTime{
+  display: inline-block;
+}
+.PCIDetails.details2 .lTime{
+  margin-left: 30px;
+}
+.PCIDetails.details2 .groupD{
+  min-width:100px;
+}
+.PCIDetails.details2 .form-group .labelText{
+  padding-left: 20px;
+  width: 70px;
+}
+.PCIDetails.details2 .tuiCon .form-group .labelText,.PCIDetails.details2 .cpuCon .groupD .labelText:nth-child(3){
+  width: auto;
+}
+.PCIDetails.details2 .leiCon .form-group{
+  min-width: 200px;
+}
+.PCIDetails.details2 .form-group{
+  min-width: auto;
+  margin: 15px 10px;
+}
+.PCIDetails.details2 .cpuCon .form-group:nth-child(1){
+  width:240px;
+}
+.PCIDetails.details2 .cpuCon .form-group:nth-child(2){
+  width: 170px;
+}
+.PCIDetails.details2 .cpuCon .form-group:nth-child(3){
+  width: 170px;
+}
+.PCIDetails.details2 #Recommend_Type,.PCIDetails.details2 .checkList{
+  display: inline-block;
+}
+.PCIDetails.details2 .checkList.more{
+  margin-left:20px;
+}
+
+/* .PCIDetails.details2 .checkList{
+  margin-left: 20px;
+} */
+.PCIDetails.details2 #Eport{
+  margin-left: 10px;
+}
+
+.PCIDetails.details2 .dropList{
+	position: fixed;
+  border: 1px solid #d0d0d0;
+  right: 8px;
+  top: 42px;
+  background-color: #FFF;
+  z-index: 1000;
+  display: none;
+  width: 160px;
+  max-height: 260px;
+  overflow: auto;
+}
+.PCIDetails.details2 .errorTip{
+  display: none;
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: #ddd;
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border: 1px solid #ddd;
+  text-align: center;
+  margin-top: 50px;
+}
+.PCIDetails.details2 .dropList .checkboxItem{
+	vertical-align: middle;
+  margin-right: 5px;
+  margin-top: 4px;
+  float:left;
+}
+.PCIDetails.details2 .dropList .listItem{
+	padding:2px 0;
+	padding-left: 10px;
+	cursor: pointer;
+}
+.PCIDetails.details2 .dropList .listItem:hover{
+	background-color: #ccc;
+}
+.PCIDetails.details2 .dropList .text{
+	margin-bottom:0;
+	font-weight: normal;
+	overflow:hidden;
+}
+.input, .textarea {
+  height: 35px;
+  line-height: 35px;
+  border: 1px solid #d0d0d0;
+  padding: 0 10px !important;
+  -webkit-transition: all .8s;
+  -moz-transition: all .8s;
+  -ms-transition: all .8s;
+  transition: all .8s;
+  border-radius: 2px;
+  /* resize: none; */
+}
+.PCIDetails.details2 .ShortLT{
+  width: 160px;
+}
+.PCIDetails.details2 .productName.input{
+  width:100px;
+}
+/* .PCIDetails.details2 .resultBabAll td{
+  position: relative;
+} */
+.PCIDetails.details2 .panel-heading .btn-primary{
+  float: right;
+  width: 80px;
+  margin-right: 40px;
+}
+.PCIDetails.details2 #CPUonlyone,.PCIDetails.details2 #Eport{
+  margin: 0;
+  margin-right: 5px;
+  margin-left: 10px;
+}
+.PCIDetails.details2 .checkList label{
+  vertical-align: middle;
+}
+
+.PCIDetails.detail3 .chooseFileAll{
+  max-height: 300px;
+  overflow: auto;
+  margin-top: 20px;
+  display: none;
+}
+.PCIDetails.detail3 #fileName{
+  text-align: center;
+  margin-top: 10px;
+}
+
+.PCIDetails.detail3 .btn-primary{
+  margin-top: 10px;
+}
+.PCIDetails.container .switch{
+  width: 13px;
+  height: 18px;
+  display: inline-block;
+}
+.PCIDetails.container .parent .switch{
+	line-height: 0;
+  margin: 0;
+  vertical-align: middle;
+  border: 0 none;
+  cursor: pointer;
+  outline: none;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  background-image: url(../images/zTreeStandard.png);
+  margin-right: 5px;
+}
+.PCIDetails.container .parent .roots_close{
+    background-position: -79px -72px;
+}
+.PCIDetails.container .parent .roots_open{
+    background-position: -97px -72px;
+}
+.PCIDetails.container .parent .text{
+	vertical-align: middle;
+}
+.PCIDetails.detail3 table .child{
+  display:none;
+}
+.PCIDetails.container .treeDom{
+  white-space: nowrap;
+  cursor: pointer;
+}
+.PCIDetails.container .child .treeDom{
+  padding-left: 20px;
+}
+.PCIDetails.detail3 .resultTab .child .treeDom{
+  padding-left:0;
+}
+.PCIDetails.detail3 .resultTab .panel-heading,.PCIDetails.detail4 .resultTab .panel-heading{
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: #ddd;
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border: 1px solid #ddd;
+  border-bottom: 0;
+}
+.PCIDetails.detail3 .panel-default{
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+#configureDetail{
+  width:500px;
+  height:400px;
+}
+#configureDetail .content{
+  height: 200px;
+  overflow: auto;
+}
+#configureDetail .content p{
+  font-size: 14px;
+  word-wrap: break-word;
+  text-align: left;
+  word-break: break-all;
+}
+#configureDetail .okBtn{
+  width:100px;
+}
+
+.PCIDetails.container .dropListCon{
+  position: relative;
+  display: inline-block;
+  margin-left: 40px;
+}
+.PCIDetails.container .dropListCon .ico{
+  position: absolute;
+  width: 30px;
+  background-color: #ff6400;
+  display: block;
+  height: 33px;
+  right: 1px;
+  top: 1px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  cursor: pointer;
+}
+.PCIDetails.container .dropListCon .ico i{
+  position: absolute;
+  top: 10px;
+  right: 11px;
+  border-top: 7px transparent dashed;
+  border-left: 7px solid #fff;
+  border-right: 0px transparent dashed;
+  border-bottom: 7px transparent dashed;
+  display: inline-block;
+  /* -webkit-transition: -webkit-transform 0.6s ease;
+  -moz-transition: -moz-transform 0.6s ease;
+  -o-transition: -o-transform 0.6s ease;
+  -ms-transition: -ms-transform 0.6s ease; */
+  transform-origin: 50% 50%;
+  -webkit-transform: translate(0, -50%);
+  -moz-transform: translate(0, -50%);
+  -ms-transform: translate(0, -50%);
+  -o-transform: translate(0, -50%);
+  transform: translate(0, -50%);
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.PCIDetails.container .dropListCon.open .ico i{
+  /* -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  transform: rotate(-90deg); */
+}
+
+.PCIDetails.detail3 .editList{
+  border-radius: 4px;
+}
+.PCIDetails.container .dropListCon .listItem{
+  position: absolute;
+  height: 350px;
+  overflow: auto;
+  border: 1px solid #d0d0d0;
+  padding: 5px;
+  box-shadow: 0 0 5px #CCC;
+  min-width: 191px;
+  background-color: #FFF;
+  z-index: 1000;
+  display: none;
+}
+.PCIDetails.container .dropListCon .listItem .chk{
+  line-height: 0;
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  border: 0 none;
+  cursor: pointer;
+  outline: none;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  background-image: url(../images/zTreeStandard.png);
+  width: 13px;
+  height: 13px;
+  margin: 0 3px 0 0;
+  cursor: auto;
+}
+.PCIDetails.container .dropListCon .listItem .checkbox_true{
+  background-position: -14px 0;
+}
+.PCIDetails.container .dropListCon .listItem .checkbox_false{
+  background-position: 0 0;
+}
+.PCIDetails.container .dropListCon .listItem .checkbox_false:hover{
+  background-position: 0 -14px;
+}
+.PCIDetails.container .dropListCon .listItem .checkbox_true:hover{
+  background-position: -14px -14px;
+}
+.PCIDetails.container .dropListCon .listItem .child{
+  display:none;
+}
+.PCIDetails.container .dropListCon .listItem .noChild{
+  margin-left: 18px;
+}
+.PCIDetails.container .dropListCon .listItem .child.child1{
+  margin-left:36px;
+}
+.PCIDetails.container .dropListCon .listItem .child.child2{
+  margin-left:38px;
+}
+.PCIDetails.container .dropListCon .listItem .child .treeDom{
+  padding-left: 0;
+}
+.PCIDetails.container .dropListCon .listItem li{
+  white-space: nowrap;
+}
+.PCIDetails.detail3 .resultTab{
+  margin-bottom: 40px;
+}
+.PCIDetails.detail3 .explain{
+  margin-bottom: 30px;
+  font-size: 14px;
+  display: none;
+}
+.PCIDetails.detail3 .explain p{
+  font-size: 14px;
+}
+.PCIDetails.detail3 .equal{
+  background-color: rgba(221, 221, 221, 0.5);
+}
+.PCIDetails.detail3 .chooseFileAll .look{
+  margin: 0;
+  margin-left:5px;
+  width: auto;
+}
+.PCIDetails.detail3 .chooseFile{
+  position: relative;
+}
+.PCIDetails.detail3 .lookAll{
+  position: absolute;
+  right: 11px;
+  top: 40px;
+  margin: 0;
+  width: auto;
+}
+.PCIDetails.detail3 .look:active:hover,.PCIDetails.detail3 .look:active,.PCIDetails.detail3 .look:focus{
+  background: #ff6400 !important;
+  border-color: #ff6400 !important;
+}
+.PCIDetails.detail3 .fileName{
+  width:650px;
+}
+.PCIDetails.detail3 .warehouse .listItem{
+  height: 100px;
+}
+
+.form-group .star {
+  margin-right: 5px;
+  font-family: tahoma;
+  color: #f86b4f;
+}
+.PCIDetails.detail4 .form-group{
+  margin-left: 10px;
+  min-width: 210px;
+}
+.PCIDetails.detail4 .dropListCon{
+  margin-left: 0;
+}
+.PCIDetails.detail4 .dropListCon .ico i{
+  border-top: 3px transparent dashed;
+  border-left: 6px solid #555;
+  border-right: 0px transparent dashed;
+  border-bottom: 3px transparent dashed;
+  top: 13px;
+}
+.PCIDetails.detail4 .dropListCon .ico{
+  background-color: #fff;
+}
+.PCIDetails.detail4 .dateInput{
+  width: 130px;
+}
+.PCIDetails.detail4 .form-group .dateIco{
+  background: url(../images/sprite.png);
+  width: 24px;
+  height: 26px;
+  background-position: -46px -61px;
+  display: inline-block;
+  position: relative;
+  right: 35px;
+  top: 7px;
+}
+.PCIDetails.detail4 .dropListCon.parts input{
+  width:130px;
+}
+.PCIDetails.detail4 .btn-primary{
+  margin-left: 98px;
+  margin-top: 0;
+}
+.PCIDetails.detail4 .inputList{
+  margin-top: 20px;
+}

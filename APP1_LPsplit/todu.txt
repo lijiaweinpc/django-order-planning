@@ -1,0 +1,995 @@
+#内存规划函数pulp
+def RAM_recommend(RAM_Capacity,CPUonlyone,Recommend_Type,HighiestLT):
+    RAM_Capacity=int(RAM_Capacity)
+    if CPUonlyone=='1':
+        MaxNUMS=12
+    else:
+        MaxNUMS=24
+    RAM_RECOMMEND=pd.DataFrame(columns=['Show_Category','Item','Item_Describe','Item_Qty','LeadTime','CostRatio','Options'])
+    RAM_RECOMMEND_index=0
+    var={}
+    if Recommend_Type!='ShortLT':
+        df_ram_option = df_ram.sort_values(by=['CostRatio','LeadTime','Capacity']).drop_duplicates(subset=['Capacity']).reset_index(drop=True)
+        if (HighiestLT !='') and (HighiestLT !=None):
+            df_ram_option=df_ram_option[(df_ram_option['LeadTime']<=HighiestLT)]
+        model = pulp.LpProblem("MinCost", pulp.LpMinimize)
+        var={}
+        aim=''
+        TTCapacity=''
+        TTNums=''
+        for index in df_ram_option.index:
+            #每个备选项是一个变量
+            var[index]=pulp.LpVariable(str(index), lowBound=0, cat='Integer')
+            #目标函数是总的成本最小
+            aim+=df_ram_option.loc[index,'CostRatio'] * var[index]
+            #约束条件要用到总容量,总条数
+            TTCapacity+=df_ram_option.loc[index,'Capacity'] * var[index]
+            TTNums+=var[index]
+        model += aim     
+        model += TTCapacity >=RAM_Capacity
+        model += TTNums <=MaxNUMS
+        model.solve()
+        status=pulp.LpStatus[model.status]
+
+    else:
+        df_ram_option = df_ram.sort_values(by=['LeadTime','CostRatio','Capacity']).drop_duplicates(subset=['Capacity']).reset_index(drop=True)        
+        #确保可以配的出要的容量来
+        for index in df_ram_option.index:
+            if df_ram_option.loc[index,'Capacity']*MaxNUMS>=RAM_Capacity:
+                break
+        df_ram_option=df_ram_option.loc[:index]
+        if (HighiestLT !='') and (HighiestLT !=None):
+            df_ram_option=df_ram_option[(df_ram_option['LeadTime']<=HighiestLT)]
+        if len(df_ram_option)==1:
+            Item=df_ram_option.loc[0,'Item']
+            Item_Describe=df_ram_option.loc[0,'Describe']
+            Item_Qty=RAM_Capacity/df_ram_option.loc[0,'Capacity']
+            if Item_Qty==int(Item_Qty):
+                    Item_Qty=int(Item_Qty)
+            else:
+                    Item_Qty=int(Item_Qty)+1
+            LeadTime=df_ram_option.loc[0,'LeadTime']
+            CostRatio=df_ram_option.loc[0,'CostRatio']*Item_Qty
+            RAM_RECOMMEND.loc[0]=['内存',Item,Item_Describe,Item_Qty,LeadTime,CostRatio,[]]
+        else:
+            model = pulp.LpProblem("MinCost", pulp.LpMinimize)
+            var={}
+            aim=''
+            TTCapacity=''
+            TTNums=''
+            for index in df_ram_option.index:
+                #每个备选项是一个变量
+                var[index]=pulp.LpVariable(str(index), lowBound=0, cat='Integer')
+                #目标函数是总的成本最小
+                aim+=df_ram_option.loc[index,'CostRatio'] * var[index]
+                #约束条件要用到总容量,总条数
+                TTCapacity+=df_ram_option.loc[index,'Capacity'] * var[index]
+                TTNums+=var[index]
+            model += aim     
+            model += TTCapacity >=RAM_Capacity
+            model += TTNums <=MaxNUMS
+            model.solve()
+            status=pulp.LpStatus[model.status]
+    
+    for key in var:
+            if status != 'Optimal':
+                break
+            elif var[key].varValue>0:
+                Item=df_ram_option.loc[key,'Item']
+                Item_Describe=df_ram_option.loc[key,'Describe']
+                Item_Qty=var[key].varValue
+                LeadTime=df_ram_option.loc[key,'LeadTime']
+                CostRatio=df_ram_option.loc[key,'CostRatio']*Item_Qty
+                RAM_RECOMMEND.loc[RAM_RECOMMEND_index]=['内存',Item,Item_Describe,Item_Qty,LeadTime,CostRatio,[]]
+                RAM_RECOMMEND_index += 1
+            else:
+                pass
+
+    return RAM_RECOMMEND
+    
+   
+
+#PCI3 views
+from django.shortcuts import render
+from . import BOQconvert
+import pandas as pd
+import openpyxl  
+import time
+from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse, HttpRequest, FileResponse
+import json
+from django.http import JsonResponse
+from sqlalchemy import create_engine
+engine = create_engine('sqlite:///db.sqlite3', echo=True)
+
+# Create your views here.
+def index(request):
+    return render(request,'PCI3/index.html')
+
+def uploads(request):
+    df = pd.DataFrame()
+    dfx = pd.DataFrame()
+    df_t = pd.DataFrame()
+    BOQNUMS=0
+    nosupport=[]#没有支持的产品
+    errorcode1=[]#没有定位行
+    hotfind=[]#找到相似爆款
+    hotcontain={}#完全包含相似爆款
+    Description_dict={}#描述字典
+    productlist=['1288H V5','2288H V5','RH1288 V3','RH2288 V3','RH2288H V3']
+    info_SHOW_BIGTYPES=['机箱','电源','CPU','硬盘','PCIe卡','基本配置','SKYLAKE CPU','SKYLAKE CPU(带内置盘机型专用)','Haswell EP CPU','Broadwell EP CPU','内存','硬盘(带2.5"拉手条)','硬盘(带2.5"拉手条)-SAS','硬盘(带2.5"拉手条)-SATA','硬盘(带2.5"拉手条)-SSD','硬盘(带2.5"拉手条)-NVMe','硬盘(带3.5"拉手条)','硬盘(带3.5"拉手条)-SAS','硬盘(带3.5"拉手条)-SATA','硬盘(带3.5"拉手条)-SSD','硬盘(带3.5"拉手条)-NVMe','RAID卡','灵活网卡插卡','Riser 卡','PCIe卡-NIC','PCIe卡-NIC/CNA card','PCIe卡-FC card','PCIe卡-IB card','PCIe卡-IB/OPA card','PCIe卡-GPU card','PCIe卡-PCIe SSD card','PCIe卡-PCIe SAS/RAID card','线缆和光模块','内置卡','光驱','滑轨和理线架','其他']
+    repolist = ['欧洲PCI','安平PCI']
+
+    if request.POST:
+        files = request.FILES.getlist('UploadForm[excelFiles][]')
+        noSelect = request.POST.get('noSelect').split(',')
+        repolist = request.POST.get('Repo').split(',')
+ 
+        for f in files:
+            dfx=pd.read_excel(f)
+            if ('名称' in dfx.columns) and ('编码' in dfx.columns) and ('数量' in dfx.columns):
+                dfx['filename']=f.name
+                break
+            dfx = pd.DataFrame()
+
+            BOQNUMS+=1
+            statuscode,df_t = BOQconvert.BOQconvert(f,productlist)
+            if (statuscode==0) and len(df_t)>0:
+                df=pd.concat([df,df_t])
+            elif (statuscode==0) and len(df_t)==0:
+                nosupport.append(f.name)
+            elif statuscode==1:
+                errorcode1.append(f.name)
+            else:
+                pass
+        if len(dfx)>0:
+            df=dfx
+    
+    HTML={}
+    for filename in nosupport:
+        HTML[filename]={'status_detail':'这个文件中没有找到现在支持的产品,现在本系统仅支持中低端服务器1288H V5,2288H V5,RH1288 V3,RH2288 V3,RH2288H V3五种产品。'}
+    for filename in errorcode1:
+        HTML[filename]={'status_detail':'这个文件不是标准的BOQ,缺少定位行'}
+    info_category = pd.read_sql("SELECT * FROM Category_PDM",engine)
+    df.rename(columns={'名称':'Name','编码':'Item','数量':'Qty'},inplace=True)
+    if len(df)>0:
+        df1=pd.merge(df,info_category,how='left').fillna('unknow')
+    else:
+        HTML['All_files']={'status_detail':'您所上传的文件中没有找到现在支持的产品,现在本系统仅支持中低端服务器1288H V5,2288H V5,RH1288 V3,RH2288 V3,RH2288H V3五种产品。'}
+        return JsonResponse(json.dumps(HTML),safe=False)     
+
+
+    #准备比对的对象，sql hot_repo并准备宽表
+    sql_hot="SELECT * FROM PCI_Hot where"
+    for repo in repolist:
+        sql_hot+=" Repo=='"+repo+"' or"
+    sql_hot=sql_hot[:-3]
+    df_hot = pd.read_sql(sql_hot,engine).sort_values(by=['Name','Item'])
+    df_hot=pd.merge(df_hot,info_category,how='left').fillna('unknow')
+    hot_cases=df_hot[(df_hot['机箱']!='N') & (df_hot['机箱']!='unknow')].set_index('Name')
+    df2=pd.DataFrame(index=hot_cases.index,columns=info_SHOW_BIGTYPES).fillna('')
+    df2['conf']=''
+    for indexs in df_hot.index:
+        ITEMNUMS=int(df_hot.loc[indexs,'Qty'])
+        APPENDITEM=str(df_hot.loc[indexs,'Item'])+'*'+str(ITEMNUMS)
+        if APPENDITEM not in Description_dict:
+            Description_dict[APPENDITEM]=df_hot.loc[indexs,'Item_Description']
+        #写入df2
+        Big_Category=df_hot.loc[indexs,hot_cases.loc[df_hot.loc[indexs,'Name'],'机箱']]
+        if(Big_Category in info_SHOW_BIGTYPES):         
+            df2.loc[df_hot.loc[indexs,'Name'],Big_Category]+=APPENDITEM+';'
+        else:
+            df2.loc[df_hot.loc[indexs,'Name'],'其他']+=APPENDITEM+';'
+        if df_hot.loc[indexs,'机箱']!='N' and df_hot.loc[indexs,'机箱']!='unknow':
+            df2.loc[df_hot.loc[indexs,'Name'],'机箱']+=APPENDITEM+';'
+        elif df_hot.loc[indexs,'电源']=='Y':
+            df2.loc[df_hot.loc[indexs,'Name'],'电源']+=APPENDITEM+';'
+        elif df_hot.loc[indexs,'CPU']=='Y':
+            df2.loc[df_hot.loc[indexs,'Name'],'CPU']+=APPENDITEM+';'
+        elif df_hot.loc[indexs,'硬盘']=='Y':
+            df2.loc[df_hot.loc[indexs,'Name'],'硬盘']+=APPENDITEM+';'
+        elif df_hot.loc[indexs,'PCIe卡']=='Y':
+            df2.loc[df_hot.loc[indexs,'Name'],'PCIe卡']+=APPENDITEM+';'
+        else:
+            pass           
+        df2.loc[df_hot.loc[indexs,'Name'],'conf']+=APPENDITEM+';' 
+    df2['Repo']=hot_cases['Repo']
+    df2['Product']=hot_cases['机箱']
+
+    #准备用户数据宽表
+    info_CONF=df1[(df1['机箱']!='N') & (df1['机箱']!='unknow')].set_index('Name')
+    df1_all=df1[df1['Name'].isin(info_CONF.index)]
+    df1_=df1_all.copy().sort_values(by=['Name','Item'])#注意按Item排序
+    print(info_CONF)
+    #info_CONF里面重塑Configuration_ID,然后整合到df1_里
+    df3=pd.DataFrame(index=info_CONF.index,columns=info_SHOW_BIGTYPES).fillna('')
+    df3['conf']=''
+    for indexs in df1_.index:
+        kitnum=int(info_CONF.loc[df1_.loc[indexs,'Name'],'Qty'])
+        ITEMNUMS=int(df1_.loc[indexs,'Qty'])/kitnum
+        if df1_.loc[indexs,'Qty']%kitnum==0:ITEMNUMS=int(ITEMNUMS) 
+        df1_.loc[indexs,'Qty']=ITEMNUMS
+        APPENDITEM=str(df1_.loc[indexs,'Item'])+'*'+str(ITEMNUMS)
+        if APPENDITEM not in Description_dict:
+            Description_dict[APPENDITEM]=df1_.loc[indexs,'Item_Description']
+        #写入df3
+        Big_Category=df1_.loc[indexs,info_CONF.loc[df1_.loc[indexs,'Name'],'机箱']]
+        if(Big_Category in info_SHOW_BIGTYPES):         
+            df3.loc[df1_.loc[indexs,'Name'],Big_Category]+=APPENDITEM+';'
+        else:
+            df3.loc[df1_.loc[indexs,'Name'],'其他']+=APPENDITEM+';' 
+        if df1_.loc[indexs,'机箱']!='N' and df1_.loc[indexs,'机箱']!='unknow':
+            df3.loc[df1_.loc[indexs,'Name'],'机箱']+=APPENDITEM+';'
+        elif df1_.loc[indexs,'电源']=='Y':
+            df3.loc[df1_.loc[indexs,'Name'],'电源']+=APPENDITEM+';'
+        elif df1_.loc[indexs,'CPU']=='Y':
+            df3.loc[df1_.loc[indexs,'Name'],'CPU']+=APPENDITEM+';'
+        elif df1_.loc[indexs,'硬盘']=='Y':
+            df3.loc[df1_.loc[indexs,'Name'],'硬盘']+=APPENDITEM+';'
+        elif df1_.loc[indexs,'PCIe卡']=='Y':
+            df3.loc[df1_.loc[indexs,'Name'],'PCIe卡']+=APPENDITEM+';'
+        else:
+            pass 
+        df3.loc[df1_.loc[indexs,'Name'],'conf']+=APPENDITEM+';'
+    df3['Product']=info_CONF['机箱']
+    df3['filename']=info_CONF['filename']
+    df3['Qty']=info_CONF['Qty']
+    df3.index+='有'+df3['Qty'].astype(str)+'台'
+    df3.index.name='Name'
+
+    #筛掉用户不关心的部件
+    df2=df2.drop(columns=noSelect,errors='ignore') 
+    df3=df3.drop(columns=noSelect,errors='ignore') 
+    info_SHOW_BIGTYPES= [i for i in info_SHOW_BIGTYPES if i not in noSelect] 
+
+    #所有配置比对Repo，计算距离
+    df_dis = pd.DataFrame(index=df3.index,columns=df2.index)
+    WEIGHT={'CPU': 0.5,'内存':0.24,'硬盘':0.12,'基本配置':0.06,'PCIe卡':0.03,'RAID卡':0.014,'网卡':0.007}
+    for i in df_dis.index:
+        for j in df_dis.columns:
+            if df3.loc[i,'机箱'] != df2.loc[j,'机箱']:
+                df_dis.loc[i,j]=999999
+                continue
+            elif (('CPU' not in noSelect) and ('内存' not in noSelect) and ('硬盘' not in noSelect) and (df3.loc[i,'CPU'] != df2.loc[j,'CPU']) and (df3.loc[i,'内存'] != df2.loc[j,'内存']) and (df3.loc[i,'硬盘'] != df2.loc[j,'硬盘'])):
+                df_dis.loc[i,j]=999999
+                continue
+            DIFF=0
+            for p in info_SHOW_BIGTYPES:                  
+                    try:
+                        W=WEIGHT[p]
+                    except KeyError:
+                        W=0.0001
+                    if df3.loc[i,p] != df2.loc[j,p]:
+                        DIFF+=1+W
+            df_dis.loc[i,j]=DIFF
+    df_dis['Product']=df3['Product']
+    df_dis['filename']=df3['filename']
+    #逐个repo筛选最近的hot
+    output=df3.reset_index().copy()
+    output['neariest']=''
+    output['neariest_dis']=999999
+    output['Father_ID']=0
+    neariest_hot=pd.DataFrame(index=range(len(output)*len(repolist)),columns=output.columns)
+    neariest_hot['neariest_dis']=999999
+    neariest_hot_index=0
+    for repo in repolist:
+        hotname=hot_cases[hot_cases['Repo']==repo].index.tolist()
+        df_dis_t=df_dis[[i for i in df_dis.columns if i in hotname]]
+        for index in output.index:
+            name=output.loc[index,'Name']
+            for hot in hotname:
+                if df_dis_t.loc[name,hot]<neariest_hot.loc[index,'neariest_dis']:
+                    neariest_hot.loc[neariest_hot_index,'Name']=hot
+                    neariest_hot.loc[neariest_hot_index,'neariest_dis']=df_dis_t.loc[name,hot]
+                    neariest_hot.loc[neariest_hot_index,'Father_ID']=name
+                    hotfind.append(name)
+                    neariest_hot.loc[neariest_hot_index,'filename']=output.loc[index,'filename']
+                    neariest_hot.loc[neariest_hot_index,'Product']=output.loc[index,'Product']
+            neariest_hot_index+=1   
+    #确定每个配置最近的hot
+    for index in output.index:
+        output.loc[index,'neariest_dis']=neariest_hot[neariest_hot['Father_ID']==output.loc[index,'Name']]['neariest_dis'].min()
+    output=output.fillna(value={'neariest_dis':'inf'})
+    #填补neariest_hot的部件,判断爆款是否被完全包含
+    neariest_hot=neariest_hot[neariest_hot['neariest_dis']!=999999]
+    for index in neariest_hot.index:
+        hotcontain_flag=1
+        hot=neariest_hot.loc[index,'Name']
+        neariest_hot.loc[index,'Name']+='_'+hot_cases.loc[hot,'Repo']
+        for p in info_SHOW_BIGTYPES:
+            neariest_hot.loc[index,p]=df2.loc[hot,p]
+            if neariest_hot.loc[index,p]!=output[output['Name']==neariest_hot.loc[index,'Father_ID']].iloc[0][p]:
+                hotcontain_flag=0
+        if hotcontain_flag==1:
+            hotcontain[neariest_hot.loc[index,'Father_ID']]=neariest_hot.loc[index,'Name']
+
+
+    #整合输出json
+    HTML['Description_dict']=Description_dict
+    #每个文件的分析
+    for filename in df3['filename'].drop_duplicates():
+        html={}
+        #有支持产品的正常BOQ
+        output_f=output[(output['filename']==filename)]
+        Confnum=len(output_f)
+        Diffconfnum=len(output_f['conf'].drop_duplicates())
+        status_detail='在文件'+filename+'中共解析了'+str(Confnum)+'个配置'
+        if Diffconfnum != Confnum:
+            status_detail+='其中不一样的配置有'+str(Diffconfnum)+'种。'
+        html['status_detail']=status_detail
+        #逐个产品去分析配置
+        for product in productlist:
+            product=product.replace(' ','_')
+            output_t=output_f[output_f['Product']==product]
+            #output_t['Name']=output_t['Name']+'有'+output_t['Qty'].astype(str)+'台;'
+            neariest_hot_t=neariest_hot[(neariest_hot['filename']==filename)&(neariest_hot['Product']==product)]
+            if len(output_t)>0:
+                #重做配型ID，合并相同配置
+                output_tt=output_t.drop_duplicates(subset=['conf'])
+                output_tt=output_tt.reset_index(drop=True)
+                if len(output_tt)!=len(output_t):
+                    #BOQ里存在完全相同的配置,把他们整合                       
+                    for index in output_tt.index:
+                        neariest_hot_tt=neariest_hot_t[neariest_hot_t['Father_ID']==output_tt.loc[index,'Name']]
+                        output_tt.loc[index,'Name']=output_t[output_t['conf']==output_tt.loc[index,'conf']]['Name'].str.cat(sep=';')
+                        output_tt.loc[index,'Qty']=output_t[output_t['conf']==output_tt.loc[index,'conf']]['Qty'].sum()
+                        if len(neariest_hot_tt)>0:
+                            for index1 in neariest_hot_tt.index:
+                                neariest_hot_t.loc[index1,'Father_ID']=output_tt.loc[index,'Name']
+                output_t=output_tt
+                output_t=output_t.reset_index()
+                output_t['index']=output_t['index']+1
+                if len(neariest_hot_t)>0:
+                    neariest_hot_t=neariest_hot_t.reset_index()
+                    for index in neariest_hot_t.index:
+                        neariest_hot_t.loc[index,'index']=neariest_hot_t.loc[index,'Name']
+                        output_tt=output_t[output_t['Name']==neariest_hot_t.loc[index,'Father_ID']]
+                        if len(output_tt)>0:
+                            neariest_hot_t.loc[index,'Father_ID']=output_tt.iloc[0]['index']
+                        else:
+                            neariest_hot_t=neariest_hot_t.drop([index])
+                    output_t=pd.concat([output_t,neariest_hot_t]).rename(columns={'index':'配型ID','Name':'BOQnames'})
+                else:
+                    output_t=output_t.rename(columns={'index':'配型ID','Name':'BOQnames'})
+                
+                Qty = output_t['Qty']
+                neariest_dis=output_t['neariest_dis']
+                output_t.drop(labels=['Qty','neariest_dis'], axis=1,inplace = True)
+                output_t.insert(1, '台套数', Qty)
+                #output_t.insert(2, '最小差异', neariest_dis)
+                output_t=output_t.fillna('')
+
+                #删掉空的列
+                for p in info_SHOW_BIGTYPES:
+                    if sum(output_t[p]!='')==0:                           
+                        output_t=output_t.drop(p,axis=1)
+                drop_list=['机箱','电源','CPU','硬盘','PCIe卡','neariest','filename','conf','Product']
+                for category in drop_list:
+                    if category in output_t.columns:
+                        output_t=output_t.drop(category,axis=1)                  
+                html[product]=output_t.to_json(orient='records')
+                #展示表头顺序
+                order=output_t.columns.tolist()
+                order=[i for i in order if i not in ['BOQnames','Father_ID']]
+                html[product+'_order']=order
+        HTML[filename]=html        
+    #整体分析报告
+    html={}
+    Confnum=len(output)
+    Diffconfnum=len(output['conf'].drop_duplicates())
+    status_detail='您共上传了'+str(BOQNUMS)+'份文件BOQ，解析出了'+str(Confnum)+'个配置；其中不一样的配置有'+str(Diffconfnum)+'种。<br>'
+    '''
+    if len(hotfind)>0:
+        status_detail+='搜索到相似爆款的配置有：<br>'
+        for f in hotfind:
+            status_detail+= f
+            status_detail+=';<br>'
+    if len(hotcontain)>0:
+        status_detail+='搜索到完全包含了某爆款的配置有：<br>'
+        for key in hotcontain.keys:
+            status_detail+= key+'完全包含了：'+hotcontain[key]
+            status_detail+=';<br>'
+    '''
+    if len(nosupport)>0:
+        status_detail+='没有可支持的产品的文件有：<br>'
+        for f in nosupport:
+            status_detail+= f
+            status_detail+=';<br>'
+    if len(errorcode1)>0:
+        status_detail+='非标准BOQ,没有找到定位行的文件有：<br>'
+        for f in errorcode1:
+            status_detail+= f
+            status_detail+=';<br>'
+    html['status_detail']=status_detail
+    for product in productlist:
+        product=product.replace(' ','_')
+        output_t=output[output['Product']==product]
+        neariest_hot_t=neariest_hot[(neariest_hot['Product']==product)]
+        if len(output_t)>0:
+            #重做配型ID，合并相同配置
+            output_tt=output_t.drop_duplicates(subset=['conf'])
+            output_tt=output_tt.reset_index(drop=True)
+            if len(output_tt)!=len(output_t):
+                #BOQ里存在完全相同的配置,把他们整合
+                for index in output_tt.index:
+                    neariest_hot_tt=neariest_hot_t[neariest_hot_t['Father_ID']==output_tt.loc[index,'Name']]
+                    output_tt.loc[index,'Name']=output_t[output_t['conf']==output_tt.loc[index,'conf']]['Name'].str.cat(sep=';')
+                    output_tt.loc[index,'Qty']=output_t[output_t['conf']==output_tt.loc[index,'conf']]['Qty'].sum()
+                    if len(neariest_hot_tt)>0:
+                        for index1 in neariest_hot_tt.index:
+                            neariest_hot_t.loc[index1,'Father_ID']=output_tt.loc[index,'Name']
+            output_t=output_tt
+            output_t=output_t.reset_index()
+            output_t['index']=output_t['index']+1
+            if len(neariest_hot_t)>0:
+                neariest_hot_t=neariest_hot_t.reset_index()
+                for index in neariest_hot_t.index:
+                    neariest_hot_t.loc[index,'index']=neariest_hot_t.loc[index,'Name']
+                    output_tt=output_t[output_t['Name']==neariest_hot_t.loc[index,'Father_ID']]
+                    if len(output_tt)>0:
+                        neariest_hot_t.loc[index,'Father_ID']=output_tt.iloc[0]['index']
+                    else:
+                        neariest_hot_t=neariest_hot_t.drop([index])
+                output_t=pd.concat([output_t,neariest_hot_t]).rename(columns={'index':'配型ID','Name':'BOQnames'})
+            else:
+                output_t=output_t.rename(columns={'index':'配型ID','Name':'BOQnames'})
+            
+            Qty = output_t['Qty']
+            neariest_dis=output_t['neariest_dis']
+            output_t.drop(labels=['Qty','neariest_dis'], axis=1,inplace = True)
+            output_t.insert(1, '台套数', Qty)
+            #output_t.insert(2, '最小差异', neariest_dis)
+            output_t=output_t.fillna('')
+
+            #删掉空的列
+            for p in info_SHOW_BIGTYPES:
+                if sum(output_t[p]!='')==0:                           
+                    output_t=output_t.drop(p,axis=1)
+            drop_list=['机箱','电源','CPU','硬盘','PCIe卡','neariest','filename','conf','Product']
+            for category in drop_list:
+                if category in output_t.columns:
+                    output_t=output_t.drop(category,axis=1)                  
+            html[product]=output_t.to_json(orient='records')
+            #展示表头顺序
+            order=output_t.columns.tolist()
+            order=[i for i in order if i not in ['BOQnames','Father_ID']]
+            html[product+'_order']=order
+    HTML['All_files']=html
+    
+    return JsonResponse(json.dumps(HTML),safe=False)
+
+def downloadexample(request):
+    
+    file=open('PCI3/appfiles/examples.rar','rb')
+    response =FileResponse(file)
+    response['Content-Type']='application/octet-stream'
+    response['Content-Disposition']='attachment;filename="examples.rar"'
+    return response
+    
+#PCI3 index
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    
+    <!-- 引入 Bootstrap -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'js/RSCUI/dialog.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'js/DropList/DropList.css' %}" rel="stylesheet" type="text/css" />  
+    
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/PCIDetails.css' %}" rel="stylesheet" type="text/css">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <title>PCI辅助设计</title>     
+
+</head>
+
+<body>
+
+    <div class="PCIDetails container detail3">
+        <div class="section-heading ">
+            <div class="section-title">PCI引导</div>
+            <div class="design-arrow"></div>
+        </div>
+        <p class="aligncenter">
+            <span>PCI匹配引导</span>
+        </p>
+        <form action="uploads" id="uploadForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="exampleInputFile" class="fileTip">请上传配置文件：</label>
+            <div class="chooseFile">
+                <input type="button" value="选择文件" class="chooseBtn btn btn-default"/>
+                <input type="button" value="下载BOQ样例" class="downloadBtn btn btn-default" />
+                <div class="dropListCon parts">
+                    <input type="text" placeholder="选择对比部件" class="editList input" readonly="readonly" />
+                    <span class="ico">
+                        <i class="iclass"></i>
+                    </span>
+                </div>
+                <div class="dropListCon warehouse">
+                    <input type="text" placeholder="选择对比对象" class="editList input" readonly="readonly" />
+                    <span class="ico">
+                        <i class="iclass"></i>
+                    </span>
+                    <div class="listItem">
+                        <ul>
+                            <li class="noChild"><span class="chk checkbox_true"></span><span class="text">欧洲PCI</span></li>
+                            <li class="noChild"><span class="chk checkbox_true"></span><span class="text">安平PCI</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="fileName"></div>
+                <div class="chooseFileAll">
+                    <input type="button" class="btn btn-danger look lookAll" value="查看全部" disabled>
+                    <table role="presentation" class="table"><tbody id="files"></tbody></table> 
+                </div>
+            </div>
+            <div class="help-block"></div>
+            
+            <input type="file" id="uploadform-excelfiles" class="excel_data" name="UploadForm[excelFiles][]"
+            multiple class="attachment-upload" accept=".xlsx"/>
+            <button type="button" class="btn btn-primary" id="fileUpload" disabled="disabled">开始分析</button>
+            <button type="button" class="btn btn-primary" id="filedownload" disabled="disabled">导出Excel</button>
+        </form>
+
+        <div class="row resultTab"></div>
+        <div class="explain">
+            <p class="title">说明：</p>
+            <div class="content"></div>
+        </div>
+
+        <div class="loaded">
+            <span class="lIco"></span>
+        </div>
+
+    </div>
+
+    <!--配置的分布详情-->
+	<div id="configureDetail" class="dialogBoxEx box-tips pop">
+		<div class="dialogTitle">
+			<h2>配置的文件分布</h2>
+			<span class="close"></span>
+		</div>
+		<div class="dialogContent">
+			<b class="d-ico ico2"></b>
+			<div class="content"></div>
+			<div class="button">
+				<input type="button" value="确 定" class="btn btn-primary okBtn">
+			</div>
+		</div>
+    </div>
+    
+    <!-- 引入jQuery -->
+    <script type="text/javascript" src="{% static 'jquery/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.table2excel.min.js' %}"></script>
+    <script src="{% static 'js/RSCUI/RSCUI.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/DropList/DropList.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/base.js' %}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        
+        var fileList;
+        var allFile = [];
+        //FormData对象初始化
+        var form = document.getElementById("upload-form");
+        var formData = new FormData(form);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        var isUpload = false;  //是否已经做过上传文件操作
+        //上传多个文件
+        $("#uploadform-excelfiles").on('change', function (e) {
+            //获取表单数据并传入formData中
+            var fileError = 0;
+            fileList = e.currentTarget.files;
+            if(isUpload){
+                $(".chooseFileAll").show();
+                $('#files').empty();
+                allFile = [];
+                formData.delete('UploadForm[excelFiles][]');
+                isUpload = false;
+            }
+            $(".chooseFileAll").show();
+            $.each(fileList, function (index, item) {
+                var fileName = item.name;
+                var fileEnd = fileName.substring(fileName.indexOf("."));
+                //上传文件格式判断
+                if (fileEnd == ".xlsx") {
+                    allFile.push(item);
+                    $('#files').append( '<tr style="padding-top: 7px;">' +
+                            '<td><p class="fileName">'+fileName+'</p></td>' +
+                            '<td>'+(item.size / 1024).toFixed(2)+'K</td>' +
+                            '<td width="160px"><input type="button" class="btn btn-danger delete" value="删除"><input type="button" class="btn btn-danger look" value="查看结果" disabled></td>' +
+                            '</tr>');
+                    //追加文件
+                    formData.append('UploadForm[excelFiles][]',item);
+                } else {
+                    fileError++;
+                }
+            });
+            if (fileError > 0) {
+                alert("只能上传 “.xlsx” 格式的文件!");
+                document.getElementById("upload-form").reset();
+                return;
+            }
+        
+            var fileCount = $('#files').find('tr').length;
+            $('#fileName').html('共上传 ' + fileCount + ' 个文件');
+            if(allFile.length > 0){
+                $("#fileUpload").removeAttr("disabled");
+            }else{
+                $("#fileUpload").attr("disabled","disabled");
+            }
+        });
+        
+        //删除文件
+        $('#files').on('click','.delete',function (e) {
+            var saveFile = [];
+            var deleteName = e.target.parentNode.previousElementSibling.previousElementSibling.textContent;
+            var deleteIndex;
+            //将不删除的放入数组中
+            $.each(allFile,function (index, item) {
+                if(item.name == deleteName){
+                    deleteIndex = index;
+                }else {
+                    saveFile.push(item);
+                }
+            });
+            allFile.splice(deleteIndex,1);
+            //表单数据重置
+            formData.delete('UploadForm[excelFiles][]');
+            //将不删除的数组追加的formData中
+            $.each(saveFile,function (index, item) {
+                formData.append('UploadForm[excelFiles][]',item);
+            });
+            
+            e.target.parentNode.parentNode.remove();
+            var fileCount = $('#files').find('tr').length;
+            $('#fileName').html('共上传 ' + fileCount + ' 个文件');
+            if(fileCount > 0){
+                $("#fileUpload").removeAttr("disabled");
+            }else{
+                $("#fileUpload").attr("disabled","disabled");
+            }
+        });
+
+        //查看结果
+        $(".chooseFileAll").on("click",".look",function(){
+            //查看全部
+            if($(this).hasClass("lookAll")){
+                createTable(dataAll["All_files"]); 
+            }else{
+                var fileName = $(this).parents("tr").find("td:eq(0)").text();
+                var flag = false;
+                for(var key in dataAll){
+                    if(key == fileName){
+                        createTable(dataAll[key]);
+                       flag = true;
+                        break;
+                    }
+                }
+                if(!flag){
+                    $(".PCIDetails .resultTab,.PCIDetails.detail3 .explain").empty();
+                }
+            }
+            $(this).parents(".chooseFileAll").find(".btn-primary").removeClass("btn-primary");
+            $(this).addClass("btn-primary");
+        })
+        
+        var dataAll;
+        //文件上传
+        $("#fileUpload").on('click',function () {
+            var len = formData.getAll('UploadForm[excelFiles][]').length;
+            $("#overlay,.loaded").show();
+            //下拉列表多选框筛选出未选择的项传给后台
+            var noSelect = [];
+            $(".dropListCon.parts .dropListUl .chk").each(function(){
+                if($(this).hasClass("checkbox_false")){
+                    noSelect.push($(this).next(".text").text());
+                }
+            })
+            formData.set("noSelect",noSelect);
+            var Repo = [];
+            $(".dropListCon.warehouse .dropListUl .chk").each(function(){
+                if($(this).hasClass("checkbox_true")){
+                    Repo.push($(this).next(".text").text());
+                }
+            })
+            formData.set("Repo",Repo);
+            if(len > 0){
+                var deleteBtn = $(".delete");
+                //通过ajax进行上传
+                $.ajax({
+                    url: 'uploads',
+                    type: 'POST',
+                    cache: false,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(data){
+                        dataAll = data = JSON.parse(data);
+                        console.log(data);
+                        $(".PCIDetails .resultTab").empty().show();
+                        
+                        $("#filedownload,.chooseFileAll .look").removeAttr("disabled");
+                        $(".chooseFileAll .lookAll").addClass("btn-primary");
+                        //$(".chooseFileAll").hide();
+                        isUpload = true;
+                        
+                        createTable(data.All_files);
+                        $(".PCIDetails.detail3 .explain").show();
+                        //$(".explain .content").html(data.All_files.status_detail);
+                        $(".loaded").hide();
+                    }
+                }).done(function(res) {
+                    if(res.code == 'ok'){
+                        //进度条设置
+                        var value = 0;
+                        var timer2 = setInterval(function () {
+                            value ++;
+                            $("#progress").css('width', value + "%");
+                            if (value == 120) {
+                                clearInterval(timer2);
+                                $("#overlay").hide();
+                                alert("文件上传成功!");
+                            }
+                        }, 50);
+                        //删除对应按钮
+                        $("#fileUpload").css("display","none");
+                        $.each(deleteBtn,function (index, item) {
+                            $(item).css("display","none");
+                        });
+                            $('#files').append('<tr><td><td><td><a type="button" class="btn btn-success pull-right" id="fileDown" href="/finalize/get-file?id=' + res.data.id + '" rel="external nofollow" >文件下载</a></td></tr>')
+                    }
+                    
+                    }).fail(function(res) {
+                        alert("文件上传失败:" + res.msg);
+                    });
+                }else {
+                    alert("请选择需要上传的文件！");
+                }
+            });
+            
+            //创建所有的表格数据
+            function createTable(data){
+                $(".PCIDetails .resultTab").empty();
+                for(var key in data){
+                    var divAll;
+                    if(key != "status_detail" && key != "status" && key.indexOf("order") == -1){
+                        var dataVal = JSON.parse(data[key]);
+                        divAll = $('<div class="panel-heading">'+key+'</div><div class="panel panel-default"><table class="table table-hover" role="presentation"><thead><tr></tr></thead><tbody></tbody></table></div>');
+                        $(".PCIDetails .resultTab").append(divAll);
+                        
+                        //列名
+                        var order = data[key+"_order"];
+                        for(var i=0;i<order.length;i++){
+                            //创建表头
+                            var td = $("<td>"+order[i]+"</td>").appendTo(divAll.find("thead tr"));
+                        }
+                        for(var j=0;j<dataVal.length;j++){
+                            var tr;
+                            if(dataVal[j]["Father_ID"] == 0){  //一级
+                                tr = $("<tr></tr>").appendTo(divAll.find("tbody"));
+                                tr.attr("levelID",dataVal[j]["配型ID"]).data(dataVal[j]);
+                            }
+                            else if(dataVal[j]["Father_ID"] != 0){  //子级
+                                tr = $("<tr></tr>").appendTo(divAll.find("tbody"));
+                                divAll.find("tr[levelID='"+dataVal[j]["Father_ID"]+"']").after(tr);
+                                tr.attr("Father_ID",dataVal[j]["Father_ID"]).addClass("child");
+                                tr.prevAll("tr[levelID='"+dataVal[j]["Father_ID"]+"']").addClass("parent");
+                            }
+                            //创建每列数据
+                            for(var k=0;k<order.length;k++){
+                                var value = dataVal[j][order[k]].toString();
+                                //给每个编码加tip提示
+                                if(value.indexOf(";") != -1){
+                                    var array = value.split(";");
+                                    var joinvalue = "";
+                                    for(var n=0;n<array.length;n++){
+                                        if(array[n] != ""){
+                                            var titleTip = dataAll.Description_dict[array[n]];
+                                            joinvalue += '<span class="codeName" title="'+titleTip+'">'+array[n]+'</span>';
+                                            if(n < array.length){
+                                                joinvalue += ";";
+                                            }
+                                        }
+                                    }
+                                    value = joinvalue;
+                                }
+                                var td = $("<td>"+value+"</td>");
+                                if(k == 0){
+                                    td = $('<td><span class="treeDom"><span class="switch roots_close"></span><span class="text">'+value+'</span></span></td>');
+                                }
+                                if(order[k] == "台套数"){
+                                    td = $("<td><a href='javascript:void(0)' class='num' title='点击查看详情' BOQnames='"+dataVal[j]["BOQnames"]+"'>"+value+"</a></td>");
+                                }
+                                tr.append(td);
+                            }
+                        }
+                    }
+                }
+                $(".explain .content").html(data.status_detail);
+            }
+            
+            //选择文件
+            $(".chooseBtn").click(function(){
+                $(".excel_data").click();
+            });
+            
+            //下载模版
+            $(".downloadBtn").click(function(){
+                var $eleForm = $("<form method='get' class='temporaryFrom'></form>");
+                //$eleForm.attr("action","https://codeload.github.com/douban/douban-client/legacy.zip/master");
+                $eleForm.attr("action","http://10.105.187.33:8000/PCI3/downloadexample");
+
+                $(document.body).append($eleForm);
+
+                //提交表单，实现下载
+                $eleForm.submit();
+                $(".temporaryFrom").remove();
+            });
+            
+            //表格点击展开子级数据
+            $(".detail3 .resultTab").delegate(".parent .treeDom","click",function(){
+                var levelID = $(this).parents("tr").attr("levelID");
+                var table = $(this).parents("table");
+                if($(this).find(".switch").hasClass("roots_close")){
+                    table.find("tr[Father_ID="+levelID+"]").show();
+                    $(this).find(".switch").removeClass("roots_close").addClass("roots_open");
+                    $(this).parents("tr").find("td").each(function(i){
+                        var pThat = $(this);
+                        if(i > 1){
+                            var tdVal = $(this).text();
+                            table.find("tr[Father_ID="+levelID+"]").each(function(j){
+                                var childTd = $(this).find("td:eq("+i+")");
+                                if(tdVal != childTd.text() && tdVal != ""){
+                                    //childTd.addClass("equal");
+                                    pThat.addClass("equal");
+                                }
+                            });
+                        }
+                    })
+                }else{
+                    table.find("tr[Father_ID="+levelID+"]").hide();
+                    $(this).find(".switch").addClass("roots_close").removeClass("roots_open");
+
+                    $(this).parents("tr").find(".equal").removeClass("equal");
+                    table.find("tr[Father_ID="+levelID+"]").find(".equal").removeClass("equal");
+                }
+            })
+            
+            //配置的分布详情
+            $(".detail3").delegate(".num","click",function(){
+                var names = $(this).attr("BOQnames").split(";");
+                $("#configureDetail .content,#configureDetail_bak .content").empty();
+                for(var i=0;i<names.length;i++){
+                    var p = $("<p>"+names[i]+"</p>");
+                    $("#configureDetail .content,#configureDetail_bak .content").append(p);
+                }
+                
+                RSC.Dialog.Div({
+                    fromDiv:{
+                        divMark:"#configureDetail"
+                    },
+                    width:500,
+                    height:400,
+                    active:[
+                        { domTag: "#configureDetail .okBtn", domEvent: "click", domDo: function (e) {
+                            
+                            e.data.close();
+                        }},
+                        { domTag: "#configureDetail .close", domEvent: "click", domDo: function (e) {
+                            e.data.close();
+                        }}]
+                });
+            })
+            
+            //下载分析结果
+            $("#filedownload").click(function(){
+                $(".resultTab").table2excel({  
+                    exclude  : ".noExl", //过滤位置的 css 类名  
+                    filename : "分析结果.xls", //文件名称  
+                    name: "Excel Document Name.xlsx",  
+                    exclude_img: true,  
+                    exclude_links: true,  
+                    exclude_inputs: true  
+                });
+            })
+
+            var dropListData = [
+     		   {title:"基本配置",value:"",childs:[{
+     			   title:"电源",value:""
+     		   }]},
+     		   {title:"CPU",value:"CPU",childs:[{
+     			   title:"SKYLAKE CPU",value:""
+     		   },{
+     			   title:"SKYLAKE CPU(带内置盘机型专用)",value:""
+     		   },{
+     			   title:"Haswell EP CPU",value:""
+     		   },{
+     			   title:"Broadwell EP CPU",value:""
+     		   }]},
+     		   {title:"内存",value:"内存"},
+     		   {title:"硬盘",value:"硬盘",childs:[{
+     			  title:'硬盘(带2.5"拉手条)',value:'',childs:[
+     				 {
+	   	     			  title:'硬盘(带2.5"拉手条)-SAS',value:''
+	   	     		   },
+     				 {
+	   	     			  title:'硬盘(带2.5"拉手条)-SATA',value:''
+	   	     		   },{
+	   	     			  title:'硬盘(带2.5"拉手条)-SSD',value:''
+	   	     		   },{
+	   	     			  title:'硬盘(带2.5"拉手条)-NVMe',value:''
+	   	     		   }
+     			  ]
+     		   },
+     		   {
+      			  title:'硬盘(带3.5"拉手条)',value:'',childs:[
+      				{
+	   	     			  title:'硬盘(带3.5"拉手条)-SATA',value:''
+	   	     		   },
+      				 {
+ 	   	     			  title:'硬盘(带3.5"拉手条)-SATA',value:''
+ 	   	     		   },{
+ 	   	     			  title:'硬盘(带3.5"拉手条)-SSD',value:''
+ 	   	     		   },{
+ 	   	     			  title:'硬盘(带3.5"拉手条)-NVMe',value:''
+ 	   	     		   }
+      			  ]
+      		   }
+     		   ]},
+     		   {title:"RAID卡",value:""},
+     		   {title:"灵活网卡插卡",value:""},
+     		   {title:"Riser 卡",value:""},
+     		   {title:"PCIe卡",value:"",childs:[{
+     			  title:"PCIe卡-NIC",value:""
+     		   },{
+     			  title:"PCIe卡-NIC/CNA card",value:""
+     		   },{
+     			  title:"PCIe卡-FC card",value:""
+     		   },{
+     			  title:"PCIe卡-IB card",value:""
+     		   },{
+     			  title:"PCIe卡-IB/OPA card",value:""
+     		   },{
+     			  title:"PCIe卡-GPU card",value:""
+     		   },{
+     			  title:"PCIe卡-PCIe SSD card",value:""
+     		   },{
+     			  title:"PCIe卡-PCIe SAS/RAID card",value:""
+     		   }]},
+     		   {title:"线缆和光模块",value:""},
+     		   {title:"内置卡",value:""},
+     		   {title:"光驱",value:""},
+     		   {title:"滑轨和理线架",value:""},
+     		   {title:"其他",value:""},
+     		   ];
+             
+     		$(".dropListCon.parts input").DropList({
+         	   data:dropListData,
+         	   isCheck:true,
+         	   defaultCheck:true,
+         	   isGetVal:false
+             });
+             
+
+             var dropListData2 = [{
+                 title:"欧洲PCI",value:""
+             },{
+                 title:"安平PCI",value:""
+             }]
+             $(".dropListCon.warehouse input").DropList({
+         	   data:dropListData2,
+         	   isCheck:true,
+         	   defaultCheck:true,
+         	   isGetVal:false
+         	});
+    
+    </script>
+</body>
+</html>

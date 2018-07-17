@@ -1,15 +1,409 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 <html>
-
     <head lang="en">
         <meta charset="UTF-8">
-        <script type="text/javascript" src="{% static 'jquery/jquery-3.3.1.js' %}"></script>
+        <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'bootstrap-3.3.7-dist/css/bootstrap.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'css/main.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'css/sites.css' %}" rel="stylesheet" type="text/css">
+
         <script type="text/javascript" src="{% static 'jquery/jquery-3.3.1.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'jquery/jquery-3.3.1.js' %}"></script> 
+
     </head>
 
-    <body>
-        pass
-    </body>
+<body>
+    <div class="sites container details2">
+        <div class="section-heading ">
+            <div class="section-title">pulp做线性规划
+            </div>
+            <div class="design-arrow"></div>
+        </div>
+        <p class="aligncenter">
+            <span>线性规划pulp</span>
+        </p>
+        
+        <form action="recommend/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="clearfix">
+                <div class="projectCon clearfix">
+                    <div class="groupList">
+                        <div class="form-group groupD">
+                            <label class="sr-only labelText" for="exampleInputEmail3"><b class="star">*</b>产品:</label>
+                            <select class="form-control" id="Product" name="Product" style="max-width:160px">
+                                <option value="1288H_V5">1288H V5</option>
+                            </select>
+                        </div>
+                        <div class="form-group groupD">
+                            <label class="sr-only labelText" for="exampleInputEmail3"><b class="star">*</b>区域:</label>
+                            <select class="form-control" id="Country" name="Country" style="max-width:90px" onchange="selectOnchang(this)">
+                                <option value="China">中国</option>
+                                <option value="Overseas">海外</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="cpuCon clearfix">
+                    <p class="title">CPU</p>
+                    <div class="groupList">
+                        <div class="form-group">
+                            <label class="sr-only labelText" for="exampleInputEmail3">型号:</label>
+                            <select id="CPU_Model" class="form-control" name="CPU_Model" style="max-width:160px" onchange="selectOnchang(this)">    
+                                <option value="">不指定CPU型号</option>
+                            </select>
+                        </div>
+                        <div class="form-group groupD">
+                            <label class="sr-only labelText" for="exampleInputEmail3">频率:</label>
+                            <select id="CPU_Frequency" class="form-control" name="CPU_Frequency" style="max-width:90px" onchange="selectOnchang(this)">    
+                                <option value="">请选择CPU频率(GHz)</option>
+                            </select>
+                        </div>
+                        <div class="form-group groupD">
+                            <label class="sr-only labelText" for="exampleInputEmail3">内核数:</label>
+                            <select id="CPU_Cores" class="form-control" name="CPU_Cores" style="max-width:90px" onchange="selectOnchang(this)">    
+                                <option value="">请先选频率</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="leiCon clearfix">
+                    <p class="title">内存</p>
+                    <div>
+                        <div class="form-group">
+                            <label class="sr-only labelText" for="exampleInputEmail3">容量:</label>
+                            <input type="text" placeholder="请输入内存容量(G)" value="" class="fileInput form-control" name="RAM_Capacity" onkeyup="filtration(this,event,/\D/g);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="clearfix">
+                <div class="yingCon clearfix">
+                    <p class="title">硬盘</p>
+                    <div>
+                        <div class="form-group">
+                            <label class="sr-only labelText" for="exampleInputEmail3">SSD:</label>
+                            <input type="text" placeholder="请输入SSD容量(G)" name="SSD_Capacity" value="" class="fileInput form-control" onkeyup="filtration(this,event,/\D/g);">
+                        </div>
+                        <div class="form-group">
+                            <label class="sr-only labelText" for="exampleInputEmail3">HDD:</label>
+                            <input type="text" placeholder="请输入HDD容量(G)" name="HDD_Capacity" value="" class="fileInput form-control" onkeyup="filtration(this,event,/\D/g);">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tuiCon">
+                    <div class="form-group group">
+                        <label class="sr-only labelText" for="exampleInputEmail3"><b class="star">*</b>推荐方式:</label>
+                        <select class="form-control" id="Recommend_Type" name="Recommend_Type" style="max-width:131px" onchange="selectOnchang(this)">
+                            <option value="LowCost">价格优先</option>
+                            <option value="ShortLT">货期优先</option>
+                            <option value="HighPrf">性能优先</option>
+                            <option value="Balance">高性价比</option>
+                        </select>
+                        <div class="checkList huoUpper">
+                            <div class="form-group">
+                                <label class="sr-only labelText" for="exampleInputEmail3">货期上限:</label>
+                                <input type="text" placeholder="请输入货期上限" name="HighiestLT" value="" class="fileInput form-control ShortLT" onkeyup="filtration(this,event,/\D/g);">
+                            </div>
+                        </div>
+                        <div class="checkList more">
+                            <input type="checkbox" value="1" name="CPUonlyone" id="CPUonlyone"><label for="CPUonlyone">只使用一个CPU</label>
+                            <input type="checkbox" value="1" name="Eport" id="Eport"/><label for="Eport">选择10GE电口</label>
+
+                        </div>
+                        
+                    </div>
+                    <button type="button" class="btn btn-primary">推荐配置</button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="errorTip"></div>
+        <div class="row resultTab">
+            <div class="panel panel-default resultBabAll">
+                <div class="panel-heading">
+                    <div class="price">料本比例：<span></span></div>
+                    <div class="lTime">货期：<span></span></div>
+                    <button type="button" class="btn btn-primary">调整</button>
+                </div>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th width="200px">部件编码</th>
+                            <th>描述</th>
+                            <th>数量</th>
+                            <th>参考货期</th>
+                            <th>料本比例</th>
+                            <th>调整</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="loaded">
+        <span class="lIco"></span>
+    </div>
+<script>
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    //搜索数组中是否存在指定的值。
+    function inArray1(needle,array,bool){
+        if(typeof needle=="string"||typeof needle=="number"){
+            for(var i in array){
+                if(needle===array[i]){
+                    if(bool){
+                        return i;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+    
+    var selectValAll = {Recommend_Type:"LowCost",Product:"1288H_V5",Country:"China"};
+
+    //菜单下拉列表点击事件货期上线
+    function selectOnchang(obj){
+        var value = obj.options[obj.selectedIndex].value;
+        var name = $(obj).attr("name");
+        selectValAll[name] = value;
+        /*
+        if(name == "Recommend_Type" && value == "ShortLT"){
+            $(".huoUpper").css("display","inline-block");
+            $(".sites.details2 .tuiCon .form-group.group").css("min-width","775px");
+        }else{
+            $(".huoUpper").hide();
+            $(".sites.details2 .tuiCon .form-group.group").css("min-width","520px");
+        }
+        */
+    }
+
+    //验证
+    function filtration(obj,e,reg){
+        if(!inArray1(e.which,[37,38,39,40,8]) && reg.test(obj.value) ){
+            var _lenght = 0;
+            $(obj).val(obj.value.replace(reg,function(e,index){
+                _lenght = index;
+                return '';
+            }));
+        }
+    }
+    $(function () {
+        //CPU型号
+        var CPU_Model=$('#CPU_Model');
+        var CPU_Frequency=$('#CPU_Frequency');  //CPU频率
+        var CPU_Cores=$('#CPU_Cores');          //CPU内核数
+        
+        //加载所有的型号数据
+        $.get('/PCI2/CPU_Model',function (dic) {//{data:[{},{},{}]}
+            $.each(dic.data,function (index, item) {//
+                CPU_Model.append('<option value="'+item.id+'">'+item.name+'</option>')
+            })
+        })
+        
+        function ajaxInfo(){
+            $.get('/PCI2/CPU_Frequency',function (dic) {//{data:[{},{},{}]}
+            CPU_Frequency.empty();
+            //CPU_Frequency.append('<option value="">请选择CPU频率(GHz)</option>');
+            CPU_Cores.empty();
+            //CPU_Cores.append('<option value="">请先选频率</option>');
+                $.each(dic.data,function (index, item) {//
+                    CPU_Frequency.append('<option value="'+item.id+'">'+item.name+'</option>')
+                    if(index == 0){
+                        setCpu_Cores(item.id);
+                        selectValAll.CPU_Frequency = item.id;
+                    }
+                })
+            });
+        }
+        ajaxInfo();
+        
+
+        //指定型号时的频率和核数联动
+        $('#CPU_Model').change(function () {
+            if(parseInt($(this).val()) >= 0){
+                $.get('/PCI2/CPU_ModelSelected'+$(this).val()+'/',function (dic) {
+                    CPU_Cores.css('display','inline-block')
+                    $.each(dic.data,function (index, item) {//
+                        CPU_Frequency.empty().append('<option value="'+item.frequency_id+'">'+item.frequency_id+'</option>')
+                        CPU_Cores.empty().append('<option value="'+item.cores_id+'">'+item.cores_id+'</option>')
+                    })
+                })
+            }else{
+                ajaxInfo();
+            }
+        })
+
+        //指定频率时和核数联动
+        $('#CPU_Frequency').change(function () {
+            setCpu_Cores($(this).val());
+        })
+        //设置内核数
+        function setCpu_Cores(value){
+            $.get('/PCI2/CPU_FrequencySelected'+value+'/',function (dic) {
+                CPU_Cores.css('display','inline-block')
+                CPU_Cores.empty()
+                $.each(dic.data,function (index, item) {//
+                    CPU_Cores.append('<option value="'+item.id+'">'+item.name+'</option>');
+                    if(index == 0){
+                        selectValAll.CPU_Cores = item.id;
+                    }
+                })
+            })
+        }
+    
+        var recordTitle = "";
+        function addTr(obj,title){
+            if(obj){
+                if(recordTitle != title){
+                    var trFirst = '<tr class="titleTr"><td colspan="6">'+title+'</td></tr>';
+                    $(".resultBabAll table tbody").append(trFirst);
+                    recordTitle = title;
+                }
+                var Options = "";
+                if(obj.Options.length > 0){
+                    Options = '<input class="productName input" readonly="true" placeholder="请选择" value="" p><div class="dropList proNameDrop">'
+                    for(var j=0;j<obj.Options.length;j++){
+                        var timestamp=new Date().getTime();
+                        var timestamp=new Date().getTime();
+                        var num = Math.floor(Math.random()*timestamp)
+                        Options += '<div class="listItem"><input type="checkbox" class="checkboxItem" id="checkI'+num+j+'"><div class="text"><label for="checkI'+num+j+'">'+obj.Options[j]+'</label></div></div>';
+                    }
+                }
+                
+                var tr = '<tr><td>'+obj.Item+'</td><td>'+obj.Item_Describe+'</td><td>'+obj.Item_Qty+'</td><td>'+obj.LeadTime+'</td><td>'+(obj.CostRatio).toFixed(2)+'</td><td>'+Options+'</td></tr>';
+                $(".resultBabAll table tbody").append(tr);
+            }
+        }
+        
+        //点击调整显示下拉列表
+        $(".sites").delegate(".productName","click",function(){
+            var top = $(this).offset().top-$(window).scrollTop()+$(this).height();
+            var left = $(this).offset().left-$(window).scrollLeft();
+
+            if(($(this).offset().top + $(this).height() + $(this).next(".dropList").height()) > $("body").height()){
+               top = top - $(this).next(".dropList").height() - $(this).height();
+            }
+            $(".dropList.proNameDrop").hide();
+            $(this).next(".dropList").show().css({left:left,top:top});
+        })
+
+        $(window).scroll(function(){
+            $(".dropList.proNameDrop").hide();
+        })
+        
+        //下拉列表点击
+        $(".sites").delegate(".dropList.proNameDrop .listItem","click",function(){
+            var valueAll = "";
+            var length = $(this).parents(".proNameDrop").find(".listItem .checkboxItem:checked").length;
+            $(this).parents(".proNameDrop").find(".listItem .checkboxItem:checked").each(function(index){
+                valueAll += $(this).next(".text").find("label").text();
+                if(index < length-1){
+                    valueAll += ",";
+                }
+            })
+            $(this).parents(".dropList").prev(".productName").val(valueAll);
+        });
+        
+        $("body").click(function(e){
+            if($(e.target).parents(".dropList").length == 0 && !$(e.target).hasClass("productName")){
+                $("table .dropList").hide();
+            }
+        })
+        
+        //推荐配置
+        $("form .btn-primary").click(function(){
+            selectValAll.RAM_Capacity = $("form .form-control[name=RAM_Capacity]").val();
+            selectValAll.SSD_Capacity = $("form .form-control[name=SSD_Capacity]").val();
+            selectValAll.HDD_Capacity = $("form .form-control[name=HDD_Capacity]").val();
+            selectValAll.HighiestLT = $("form .form-control[name=HighiestLT]").val();
+
+            if($("form input[name=CPUonlyone]").is(":checked")){
+                selectValAll.CPUonlyone = $("form input[name=CPUonlyone]").val();
+            }else{
+                selectValAll.CPUonlyone = 0;
+            }
+            if($("form input[name=Eport]").is(":checked")){
+                selectValAll.Eport = $("form input[name=Eport]").val();
+            }else{
+                selectValAll.Eport = 0;
+            }
+            
+            $(".loaded").show();
+            $.post("recommend/",selectValAll,function(data){
+                if(data && data.length > 0){
+                    var data = JSON.parse(data);
+                    if(data.Html_Status == "OK"){
+                        createTr(data);
+                    }
+                    else if(data.Html_Status == "FAIL"){
+                        $(".sites.details2 .errorTip").show().text(data.Html_Status_Detail);
+                        $(".sites.details2 .resultTab").hide();
+                    }
+                    $(".loaded").hide();
+                }
+            })
+        })
+        //加载table数据
+        function createTr(data){
+            $(".sites.details2 .errorTip").hide()
+            $(".sites.details2 .resultTab").show();
+            $(".resultBabAll table tbody").empty();
+            
+            var pci = data.Html_Recommend_PCI;      //汇总数据
+            var conf = data.Html_Recommend_CONF;
+            if(conf){
+                conf = JSON.parse(conf);
+                for(var i=0;i<conf.length;i++){
+                    addTr(conf[i],conf[i].Show_Category);
+                }
+            }
+            
+            if(pci){
+                $(".sites.details2 .price span").text((pci.CostRatio).toFixed(2));
+                $(".sites.details2 .lTime span").text(pci.LeadTime+" 天");
+            }
+        }
+
+        //调整
+        $(".panel-heading .btn-primary").click(function(){
+            var itemsArray = [];
+            $("table .productName.input").each(function(){
+                var value = $(this).val();
+                var Item = $(this).parents("tr").find("td:eq(0)").text();
+                if(value){
+                    var items = {Item:Item,Options:value};
+              
+                    itemsArray.push(items);
+                }
+            })
+            if(itemsArray.length == 0){
+                alert("没有需要调整的数据!");
+                return;
+            }
+            $(".loaded").show();
+            $.post("recommend_adjust/",{items:itemsArray},function(data){
+                if(data && data.length > 0){
+                    data = JSON.parse(data);
+                    createTr(data);
+                    $(".loaded").hide();
+                }
+            })
+        })
+    });
+
+</script>
+
+</body>
 
 </html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+	<title>Index</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="" />
+	<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+	<!-- css -->
+	<link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" type="text/css" media="all" />
+	<link href="{% static 'css/flexslider.css' %}" rel="stylesheet" type="text/css" media="screen" property="" />
+	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" media="all" />	
+	<!--// css -->
+	<script src="{% static 'js/jquery.min.js' %}"></script>
+	<script src="{% static 'js/bootstrap.js' %}"></script>
+</head>
+
+<body> 
+<!-- Header -->
+	<div class="header">
+		<!-- Navbar -->
+		<nav class="navbar navbar-default">
+			<div class="container">
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li class="hover-effect"><a href="http://lijiaweinpc.github.io">我的博客</a></li>
+						<li class="hover-effect"><a href="mailto:npc_li@163.com">给我邮件</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<!-- //Navbar -->
+
+		<!-- Slider -->
+		<div class="slider">
+			<ul class="rslides" id="slider">
+				<li>
+					<img src="{% static 'images/banner1.jpg' %}" alt="" />
+				</li>
+				<li>
+					<img src="{% static 'images/banner2.jpg' %}" alt="" />
+				</li>
+			</ul>
+		</div>
+		<!-- //Slider -->
+
+	</div>
+	<!-- Banner-Slider-JavaScript -->
+	<script src="{% static 'js/responsiveslides.min.js' %}"></script>
+	<script>
+		$(function () {
+			$("#slider").responsiveSlides({
+				auto: true,
+				nav: true,
+				speed: 800,
+				namespace: "callbacks",
+				pager: true,
+			});
+		});
+	</script>
+	<!-- //Banner-Slider-JavaScript -->
+	<!-- //Header -->
+
+<!-- all apps -->
+<div class="new-w3-agile">
+	<div class="container">
+		<h3>all apps</h3>
+		<div class="col-md-3 new-grid-w3l view view-eighth">
+			<img src="{% static 'images/ng1.jpg' %}" alt=" " />
+			<div class="mask">
+				<a href="{% url 'APP1:index' %}"><h4>Click here</h4></a>
+				<p>To learn more about this</p>
+			</div>
+		</div>
+		<div class="col-md-3 new-grid-w3l view view-eighth">
+			<img src="{% static 'images/ng2.jpg' %}" alt=" " />
+			<div class="mask">
+				<a href="{% url 'APP1:index' %}"><h4>Click here</h4></a>
+				<p>To learn more about this</p>
+			</div>
+		</div>
+		<div class="col-md-3 new-grid-w3l view view-eighth">
+			<img src="{% static 'images/ng3.jpg' %}" alt=" " />
+			<div class="mask">
+				<a href="{% url 'APP1:index' %}"><h4>Click here</h4></a>
+				<p>To learn more about this</p>
+			</div>
+		</div>
+		<div class="col-md-3 new-grid-w3l view view-eighth">
+			<img src="{% static 'images/ng4.jpg' %}" alt=" " />
+			<div class="mask">
+				<a href="{% url 'APP1:index' %}"><h4>Click here</h4></a>
+				<p>To learn more about this</p>
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
+</div>
+<!-- //all apps-->
+
+<div class="services-bottom-w3-agileits">
+	<div class="container">
+		<div class="wthree_info">
+			<section class="slider">
+				<div class="flexslider">
+					<ul class="slides">
+						<li>
+							<div class="wthree_info_grid">
+								<h3>Django官方网站入门教程</h3>
+								<p>最简洁最快速的官方基础入门</p>
+								<a href="https://www.djangoproject.com/" class="learn">GO</a>
+							</div>
+						</li>
+						<li>
+							<div class="wthree_info_grid">
+								<h3>Bootstrap中文网</h3>
+								<p>学习强悍优雅的web前端框架。</p>
+								<a href="http://www.bootcss.com/" class="learn">GO</a>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</section>
+
+			<!-- flexSlider -->	
+			<script defer src="{% static 'js/jquery.flexslider.js' %}"></script>
+			<script type="text/javascript">
+			$(window).load(function(){
+				$('.flexslider').flexslider({
+				animation: "slide",
+				start: function(slider){
+					$('body').removeClass('loading');
+				}
+				});
+			});
+			</script>
+			<!-- //flexSlider -->
+			</div>
+		</div>
+	</div>
+
+<!-- footer -->
+<div class="footer">
+	<div class="container">
+		<div class="copyright">
+			<p>Copyright &copy; 2018.jiawei All rights reserved.
+		</div>
+	</div>
+</div>
+
+<!-- //footer -->
+</body>
+</html>

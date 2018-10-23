@@ -2,6 +2,8 @@ from django.urls import path,re_path
 
 from . import views
 
+app_name = 'APP1'
+
 urlpatterns = [
     re_path(r'StapleSelected(\d+)/',views.StapleSelected),
     path(r'Recommend/',views.Recommend),

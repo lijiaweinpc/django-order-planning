@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import pulp
 import json
-#取出产品数据基表ITEM_CATEGORY
+# Get product df ITEM_CATEGORY
 engine = create_engine('sqlite:///db.sqlite3', echo=True)
 ITEM_CATEGORY = pd.read_sql("SELECT * FROM APP1_LPsplit_ITEM_CATEGORY",engine).fillna('')
 
@@ -14,6 +14,7 @@ def Index(request):
     return render(request,'APP1_LPsplit/index.html')
 
 def Staple(request):
+    # Give all staple directly for choose
     Staple = ITEM_CATEGORY[ITEM_CATEGORY['ITEM_CATEGORY']=='Staple']  
     list = []
     for index in Staple.index:
@@ -21,41 +22,31 @@ def Staple(request):
     return JsonResponse({'data':list})
 
 def StapleSelected(request,id):
+    # When cilcking on a staple, show the price
     ITEM = ITEM_CATEGORY.loc[int(id),'ITEM']
     PRICE = ITEM_CATEGORY.loc[int(id),'PRICE']
     list = []
     list.append({'ITEM_ID':str(ITEM),'ITEM_NAME':str(ITEM),'PRICE_ID':str(PRICE),'PRICE_NAME':str(PRICE)})
     return JsonResponse({'data':list})
 
-def StapleRecommand(Staple,Qty):
-    STAPLE_RECOMMEND = pd.DataFrame(columns=['ITEM_CATEGORY','ITEM','ITEM_DESCRIPTION','Qty','PRICE'])
-    if Staple!='':
-        STAPLE_RECOMMEND.loc[0] = [ITEM_CATEGORY.loc[Staple,'ITEM_CATEGORY'],ITEM_CATEGORY.loc[Staple,'ITEM'],ITEM_CATEGORY.loc[Staple,'ITEM_DESCRIPTION'],Qty,ITEM_CATEGORY.loc[Staple,'PRICE']]
-    return STAPLE_RECOMMEND
-
 def RandRecommand(TTPay):
+    # Main recommand function
     RAND_RECOMMAND = pd.DataFrame(columns=['ITEM_CATEGORY','ITEM','ITEM_DESCRIPTION','Qty','PRICE'])
     RAND_RECOMMAND_INDEX = 0
-    import random
-    Rand_TTNums = random.randint(int(TTPay/ITEM_CATEGORY.PRICE.mean()),int(TTPay/ITEM_CATEGORY.PRICE.min()))
-    ITEM_CATEGORY_T = ITEM_CATEGORY[ITEM_CATEGORY['ITEM_CATEGORY']!='Staple']
-    model = pulp.LpProblem("MinCost", pulp.LpMinimize)
+    # Using rand 50% of the choices everytime
+    ITEM_CATEGORY_T = ITEM_CATEGORY[ITEM_CATEGORY['ITEM_CATEGORY']!='Staple'].sample(frac=0.5)
+    model = pulp.LpProblem("Rand Food", pulp.LpMinimize)
     var = {}
     aim = ''
     TTPRICE = ''
     TTNums = ''
     for index in ITEM_CATEGORY_T.index:
-        #每个备选项是一个变量
         var[index] = pulp.LpVariable(str(index), lowBound=0, cat='Integer')
-        #目标函数是总的价格最小
-        aim += ITEM_CATEGORY_T.loc[index,'PRICE'] * var[index]
-        #约束条件要用到总数量和总价格
         TTPRICE += ITEM_CATEGORY_T.loc[index,'PRICE'] * var[index]
         TTNums += var[index]
-        model += var[index] <= 3
-    model += aim     
-    model += TTPRICE >= TTPay
-    model += TTNums >= Rand_TTNums
+        model += var[index] <=2
+    model += TTPay - TTPRICE    
+    model += TTPRICE <= TTPay
     model.solve()
     status = pulp.LpStatus[model.status]
 
@@ -73,18 +64,18 @@ def Recommend(request):
     Staple = ''
     TTPay = '' 
 
-    #接收用户的输入
+    # Get request
     if request.POST:
         Staple = request.POST.get('Staple')
         TTPay = request.POST.get('TTPay')
     
     Recommend_CONF = pd.DataFrame()
     Recommend_SUMMARY = {'TTPay':0}
-    #锁定Staple的选择
+    # Get selected staple
     if Staple!= '' and Staple!= None:
         STAPLE_RECOMMEND = StapleRecommand(int(Staple),1)
         Recommend_CONF = pd.concat([Recommend_CONF,STAPLE_RECOMMEND])
-    #价格限制下的随机推荐
+    # Rand recommend with price limination
     if TTPay!= '' and TTPay!=None:
         RAND_RECOMMAND = RandRecommand(int(TTPay))
         if len(RAND_RECOMMAND)>0:
@@ -97,7 +88,7 @@ def Recommend(request):
         html['Html_Status_Detail']='OK'
     else:
         html['Html_Status']='FAIL'
-        html['Html_Status_Detail']='实在满足不了你'
+        html['Html_Status_Detail']='Cannot satisfy you'
     html['Html_Recommend_CONF']=Recommend_CONF.to_json(orient='records')   
     html['Html_Recommend_SUMMARY']=Recommend_SUMMARY
     return JsonResponse(json.dumps(html),safe=False)

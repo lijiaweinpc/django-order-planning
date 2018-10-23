@@ -1,0 +1,136 @@
+
+
+.dropListContainer{
+    position: absolute;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      top: 100%;
+      left: 0;
+      z-index: 1000;
+      float: left;
+      min-width: 160px;
+      font-size: 14px;
+      list-style: none;
+      background-color: #fff;
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 4px;
+      -webkit-box-shadow: 0 6px 12px rgba(0,0,0,0.175);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.175);
+      background-clip: padding-box;
+      overflow: auto;
+    display:none;
+  }
+  .dropListContainer .dropListUl{
+    padding:0 5px;
+  }
+  .dropListContainer.selectClass .dropListUl{
+    padding:0;
+  }
+  .dropListContainer .dropListUl .switch{
+    width: 13px;
+    height: 18px;
+    display: inline-block;
+  }
+  .dropListContainer .dropListUl .parent .switch{
+    line-height: 0;
+    margin: 0;
+    vertical-align: middle;
+    border: 0 none;
+    cursor: pointer;
+    outline: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-image: url(img/zTreeStandard.png);
+    margin-top: -4px;
+    margin-right: 5px;
+  }
+  .dropListContainer .dropListUl .parent .roots_close{
+      background-position: -79px -72px;
+  }
+  .dropListContainer .dropListUl .parent .roots_open{
+      background-position: -97px -72px;
+  }
+  .dropListContainer .dropListUl .parent .text{
+    vertical-align: middle;
+  }
+  .dropListContainer .dropListUl .treeDom{
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .dropListContainer .dropListUl .child .treeDom{
+    padding-left: 20px;
+  }
+  /* .dropListContainer .dropListUl{
+    position: absolute;
+    height: 350px;
+    overflow: auto;
+    border: 1px solid #d0d0d0;
+    padding: 5px;
+    box-shadow: 0 0 5px #CCC;
+    min-width: 191px;
+    background-color: #FFF;
+    z-index: 1000;
+    display: none;
+  } */
+  .dropListContainer .dropListUl .chk{
+    line-height: 0;
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    border: 0 none;
+    cursor: pointer;
+    outline: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-image: url(img/zTreeStandard.png);
+    width: 13px;
+    height: 13px;
+    margin: 0 5px 0 0;
+    cursor: auto;
+    margin-top: -3px;
+  }
+  .dropListContainer .dropListUl .checkbox_true{
+    background-position: -14px 0;
+  }
+  .dropListContainer .dropListUl .checkbox_false{
+    background-position: 0 0;
+  }
+  .dropListContainer .dropListUl .checkbox_false:hover{
+    background-position: 0 -14px;
+  }
+  .dropListContainer .dropListUl .checkbox_true:hover{
+    background-position: -14px -14px;
+  }
+  .dropListContainer .dropListUl .child{
+    display:none;
+  }
+  .dropListContainer .dropListUl .noChild,.dropListContainer .dropListUl .child{
+    padding-left: 18px;
+  }
+  .dropListContainer .dropListUl .child .treeDom{
+    padding-left: 0;
+  }
+  .dropListContainer .dropListUl li{
+    white-space: nowrap;
+    line-height: 25px;
+  }
+  .dropListContainer .dropListUl .text{
+    cursor:default;
+  }
+  .dropListContainer.selectClass li:hover{
+    color: #262626;
+      text-decoration: none;
+      background-color: #f5f5f5;
+  }
+  .dropListContainer.selectClass li.active{
+    color: #fff;
+      text-decoration: none;
+      background-color: #428bca;
+  }
+  
+  

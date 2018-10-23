@@ -1,0 +1,1151 @@
+
+/*
+*瀵硅瘽妗哻ss  瀵瑰簲RSC.UI.js鎻掍欢
+*/
+.pop {
+    display: none;
+    position: relative;
+    width: 450px;
+    text-align: left;
+    color: #fff;
+    z-index: 100;
+}
+/* Pop up ================================================================================ */
+.pop:after{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: url(../images/pop-bg.jpg) 0 0 no-repeat;
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+    z-index: 99;
+    background-color: #FFF;
+}
+.pop{
+    display: none;
+    position: relative;
+    /*position: fixed;
+    left: 50%;
+    top: 50%;*/
+    width: 400px;
+    text-align: left;
+    color: #213047;
+    z-index: 100;
+}
+.pop-title{
+    position: relative;
+    padding: 25px 20px;
+    min-height: 30px;
+    text-align: center;
+    z-index: 100;
+}
+.pop-title .close{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 24px;
+    height: 24px;
+    opacity: .5;
+    background-position: 0 -280px;
+    cursor: pointer;
+}
+.pop-title .close:hover{
+    opacity: 1;
+}
+.pop-title h2{
+    font: 24px/30px Microsoft Yahei;
+}
+.pop-content{
+    position: relative;
+    padding: 0 30px 30px;
+    z-index: 100;
+}
+.pop-content p.meetText{
+    font-size: 16px;
+    line-height: 25px;
+    text-indent: 2em;
+}
+.pop-content .big-v .ico{
+    position: absolute;
+    right: 40px;
+    top: 5px;
+    width: 96px;
+    height: 96px;
+    opacity: .5;
+    background-position: -500px -333px;
+}
+#pop-real .pop-content .big-v .ico{
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background-position: -310px -607px;
+    opacity: 1;
+    top: 0;
+    margin-top: -30px;
+    right: 0;
+}
+.pop .button{
+    text-align: center;
+}
+.pop .button .btn{
+    margin: 0 10px;
+}
+.pop .button .close:hover{
+    opacity: 1;
+}
+.pop .button.only .close{
+    display: none;
+}
+h4{margin:0;padding:0;}
+a{ text-decoration: none;}
+li{ list-style: none;}
+.dialogContent .close,.dialogBox .spriteIco{
+    background: url(../../images/sprite.png?v=RSC_VERSION) no-repeat;
+    display: inline-block;
+    background-position: -430px -28px;
+}
+
+.dialogBox:before{
+    content: "";
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.5);
+    z-index: 99;
+}
+.dialogBoxEx:after{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #eee;
+    /*background: url(../images/pop-bg.jpg) 0 0 no-repeat;*/
+    /*background-color: #ffff00;*/
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+    z-index: 99;
+}
+.dialogBoxEx.uesr:after{
+    background: #fff;
+}
+.dialogBoxEx.uesr .dialogContent:after{
+    content: " ";
+    position: absolute;
+    bottom: 110px;
+    left: 0px;
+    width: 100%;
+    height: 1px;
+    background: #ebebeb;
+}
+.dialogBoxEx{
+    position: relative;
+    color: #333;
+    z-index: 100;
+    width: auto;
+}
+.dialogTitle{
+    position: relative;
+    padding: 25px 20px;
+    text-align: center;
+    z-index: 100;
+    min-height: 50px;
+}
+.dialogTitle .close,.dialogContent .sysClose,.pop-title .close{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 20px;
+    height: 20px;
+    background-position: -232px -131px;
+    cursor: pointer;
+    opacity: .5;
+}
+.dialogTitle .close:hover, .dialogContent .sysClose:hover, .dialogTitle .close:hover, .dialogTitle .close:active, .dialogContent .sysClose:active, .dialogTitle .close:active {
+    background-position: -252px -131px;
+}
+.dialogTitle h2{
+    margin: 0 auto;
+    /*width: 600px;*/
+    font: 24px/30px Microsoft Yahei;
+    word-break: break-word;
+    word-wrap: break-word;
+}
+.dialogBoxEx .dialogContent{
+    text-align: center;
+    position: relative;
+    padding: 0 30px 30px;
+    z-index: 100;
+}
+.dialogBoxEx .button{
+    text-align: center;
+}
+.dialogBoxEx .button .btn{
+    margin: 0 10px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0;
+}
+.dialogBoxEx .button .close{
+    background: none;
+    color: #919191;
+    float: none;
+    font-weight: normal;
+    opacity: 1;
+}
+.dialogBoxEx .button .close:hover{
+    color: #333;
+}
+.dialogBoxEx .button.only .close{
+    display: none;
+}
+/*========鎻愮ず绫诲脊绐�=========*/
+.box-tips{
+    text-align: center;
+    z-index: 101;
+    width:auto;
+    height:auto;
+}
+
+.box-tips .text{
+    font-size: 24px;
+    line-height: 26px;
+    /*white-space: nowrap;*/
+    word-break: break-all;
+    word-wrap: break-word;
+    color: #171717;
+
+}
+.box-tips .text span{
+    margin: 0 10px;
+}
+.box-tips .d-ico{
+    width: 75px;
+    height: 75px;
+    margin: 0 auto;
+    margin-bottom: 25px;
+}
+#sucess .d-ico{
+    background-position: -281px -567px;
+    margin-top: -23px;
+    width: 55px;
+    height: 42px;
+    margin-bottom: 30px;
+}
+#sucess .text{
+    font-size:20px;
+}
+#error .d-ico{
+    background-position: -346px -541px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 35px;
+}
+#warn .d-ico,#confirm .d-ico{
+    background-position: -406px -541px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 35px;
+}
+.box-tips .time{
+    margin: 25px 0 10px;
+}
+.box-tips .time span{
+    margin-right: 5px;
+}
+.box-tips .link a{
+    margin-left: 5px;
+    color: #0a8cd2;
+}
+.box-tips .button{
+    margin-top: 25px;
+}
+
+#confirm .dialogTitle .close{
+    display: block;
+}
+
+
+#brokerageShell{
+    height: 100%;
+    width: 100%;
+}
+#brokerageShell .pop-content{
+    position: absolute;
+    left: 50%;
+    top:50%;
+    width: 100%;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%);
+    -moz-transform: translate(-50%,-50%);
+}
+#brokerageShell .pop-content .LoginNow{
+    color:#967e50;
+}
+#brokerageShell .pop-content .LoginNowLogo{
+    width: 150px;
+    text-align: center;
+    margin: auto;
+}
+#brokerageShell .pop-content .LoginNowLogo span{
+    width: 150px;
+    height: 150px;
+    display: inline-block;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,.05);
+    position: relative;
+    cursor: pointer;
+}
+#brokerageShell .pop-content .LoginNowLogo i{
+    width: 115px;
+    height: 115px;
+    display: inline-block;
+    border-radius: 50%;
+    background-color: #937a4a;
+    
+}
+#brokerageShell .pop-content .LoginNowLogo .ico{
+    background-position: -1px -202px;
+    display: inline-block;
+    width: 70px;
+    height: 70px;
+}
+#brokerageShell .pop-content .LoginNowLogo p{
+    cursor: pointer;
+    padding-top:10px;
+}
+#brokerageShell .pop-content .itemlis{
+    padding-top: 60px;
+    text-align: center;
+    color: #fff;
+}
+#brokerageShell .pop-content .itemlis li{
+    width: 130px;
+    height: 100px;
+    cursor: pointer;
+    display: inline-block;
+}
+#brokerageShell .pop-content .itemlis li p{
+    padding-top: 15px;
+    font-size: 24px;
+}
+#brokerageShell .pop-content .itemlis li .ico{
+    width: 64px;
+    display: inline-block;
+    height: 50px;
+}
+#brokerageShell .pop-content .itemlis li.directSeedingRoom .ico{
+    background-position: -310px -54px;
+}
+#brokerageShell .pop-content .itemlis li.meet .ico{
+    background-position: 2px -55px;
+}
+#brokerageShell .pop-content .itemlis li.investmentStrategy .ico{
+    height: 58px;
+    background-position: -69px -212px;
+}
+#brokerageShell .pop-content .itemlis li.adviser .ico{
+    background-position: -138px -213px;
+    height: 56px;
+}
+#brokerageShell .pop-content .itemlis li.news .ico{
+    background-position: -123px -53px;
+}
+#brokerageShell .pop-content .itemlis li.notice .ico{
+    background-position: -62px -54px;
+}
+#brokerageShell .pop-content .itemlis li.account .ico{
+    background-position: -205px -215px;
+}
+#brokerageShell .pop-content .itemlis li.answers .ico{
+    background-position: -184px -55px;
+}
+#brokerageShell .pop-content .itemlis li.calendars .ico{
+    background-position: -245px -55px;
+}
+#brokerageShell .pop-content .itemlis li:hover{
+    color: #dab766;
+}
+#brokerageShell .pop-content .itemlis li.meet:hover .ico{
+    background-position: -329px -345px;
+}
+#brokerageShell .pop-content .itemlis li.news:hover .ico{
+    background-position: -467px -347px;
+}
+#brokerageShell .pop-content .itemlis li.notice:hover .ico{
+    background-position: -231px -400px;
+}
+#brokerageShell .pop-content .itemlis li.calendars:hover .ico{
+    background-position: -363px -401px;
+}
+#brokerageShell .pop-content .itemlis li.directSeedingRoom:hover .ico{
+    background-position: -236px -457px;
+}
+#brokerageShell .pop-content .itemlis li.hover{
+    color: #b79045;
+}
+#brokerageShell .pop-content .itemlis li.meet.hover .ico{
+    background-position: -400px -346px;
+}
+#brokerageShell .pop-content .itemlis li.news.hover .ico{
+    background-position: -530px -348px;
+}
+#brokerageShell .pop-content .itemlis li.notice.hover .ico{
+   background-position: -298px -400px;
+}
+#brokerageShell .pop-content .itemlis li.calendars.hover .ico{
+    background-position: -425px -401px;
+}
+#brokerageShell .pop-content .itemlis li.directSeedingRoom.hover .ico{
+    background-position: -235px -457px;
+}
+/* login */
+#login{
+    width: 490px;
+}
+#login .dialogTitle{
+    padding: 30px 25px 30px;
+    text-align: center;
+}
+#login .dialogTitle .logo{
+    background: url(../../home/images/logo4.png) center 0 no-repeat;
+    width: 150px;
+    height: 70px;
+    display: inline-block;
+}
+#login .dialogContent{
+    text-align: left;
+}
+#login .error{
+    display: none;
+    position: absolute;
+    left: 80px;
+    top: -25px;
+    width: 318px;
+    border: 1px solid #da4839;
+    background: #da4839;
+    text-align: center;
+    color: #fff;
+}
+#login .user,#login .password{
+    margin-bottom: 20px;
+    text-align: center;
+}
+#login .password{
+    margin-bottom: 25px;
+}
+#login .input{
+    border:1px solid #B5B5B5;
+    padding: 10px 12px;
+    width: 296px;
+    height: 20px;
+    font-size: 16px;
+    color: #333333;
+    background-color: #FFF;
+}
+#login .input:hover,#login .input:focus{
+    border:1px solid #DAA731;
+    background-color:#FFF;
+}
+#login .button{
+    margin-bottom: 30px;
+}
+#login .button .btn{
+    width: 320px;
+    height: 50px;
+    font-size: 20px;
+}
+#login .dialogContent .link{
+    color: #656565;
+    margin-bottom: 50px;
+    height: 20px;
+    padding:0px 50px;
+}
+#login .link .forget{
+    float: right;
+}
+#login .link a{
+    color: #a87c39;
+}
+#login .link a:hover{
+    text-decoration: underline;
+}
+#login .other{
+    position: relative;
+    padding-top: 30px;
+    text-align: center;
+}
+#login .other:before,#login .other:after{
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 95px;
+    border-top: 1px solid #fff;
+}
+#login .other:before{
+    left: 0;
+}
+#login .other:after{
+    right: 0;
+}
+#login .other p{
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    margin-left: -60px;
+    width: 120px;
+    text-align: center;
+}
+#login .other .d-ico{
+    margin: 0 15px;
+    width: 60px;
+    height: 60px;
+}
+#login .other .d-ico-wechat{
+    background-position: 0 -150px;
+}
+#login .other .d-ico-weibo{
+    background-position: -60px -150px;
+}
+#login .other .d-ico-qq{
+    background-position: -120px -150px;
+}
+#login .otherTips{
+    position: absolute;
+    left:0px;
+    bottom:105px;
+    background: #0c202f;
+    padding:30px;
+    display: none;
+}
+#login .otherTips h4{
+    margin-bottom:10px;
+}
+#login .otherTips p{
+    font-size:12px;
+    opacity: .6;
+}
+#login .otherTips span{
+    opacity: .6;
+    display: block;
+    padding-top:10px;
+}
+#login .otherTips i{
+    display: block;
+    width: 0px;
+    height:0px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #0c202f;
+    position: absolute;
+    bottom:-5px;
+    left:145px;
+}
+#login .otherTips .d-ico{
+    width:12px;
+    height:12px;
+    background-position: -420px -122px;
+    position: absolute;
+    top:10px;
+    right:10px;
+    opacity: .6;
+    transform:scale(1.2);
+    cursor: pointer;
+}
+#login .otherTips .d-ico:hover{
+    background-position: -420px -135px;
+    transform:scale(1.2);
+}
+/* 鍙備細鐧诲綍 */
+#joinLogin{
+    
+}
+#joinLogin .dialogTitle{
+    text-align: left;
+    padding: 15px 30px 30px;
+}
+#joinLogin .dialogContent{
+    padding: 0 50px 30px;
+}
+#joinLogin .dialogContent h2{
+    text-align: left;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font-family: "Microsoft Yahei Regular"
+}
+#joinLogin .dialogContent .error{
+    background: #da4839 none repeat scroll 0 0;
+    border: 1px solid #da4839;
+    color: #fff;
+    display: none;
+    text-align: center;
+    width: 348px;
+    height: 25px;
+    line-height: 25px;
+}
+#joinLogin .dialogContent .titleType{
+    display: inline-block;
+    font-size: 24px;
+}
+#joinLogin .dialogContent .select{
+    display: inline-block;
+    float: right;
+    cursor: pointer;
+}
+#joinLogin .invitedLogin {
+    display:none;
+}
+#joinLogin .inputBox {
+    display: block;
+    margin-bottom: 20px;
+    text-align: left;
+}
+#joinLogin .inputBox input{
+    width: 330px;
+}
+#joinLogin .inputBox.button input{
+    width: 100%;
+    margin: 0;
+}
+#joinLogin .dialogContent .link {
+    color: #656565;
+    height: 20px;
+    margin-bottom: 30px;
+    text-align: left;
+    margin-top: 20px;
+}
+#joinLogin .link a {
+    color: #a87c39;
+}
+#joinLogin .link .forget {
+    float: right;
+}
+#joinLogin .inputBox input#account{
+    width: 330px;
+}
+#joinLogin .yz-code {
+    cursor: pointer;
+    padding-top: 5px;
+    position: absolute;
+    right: 0;
+    top: -2px;
+}
+#joinLogin .yz-code img{
+    margin-right:8px;
+}
+#joinLogin .yz-code a{
+    opacity: 0.6;
+    color: #d09e3d;
+}
+#joinLogin .pic-vf .ico{
+    right: 160px;
+}
+#joinLogin .code .ico{
+    right: 160px;
+}
+#joinLogin .pic-vf .input, #joinLogin .code .input {
+    overflow: hidden;
+    text-align: left;
+    width: 178px;
+}
+#joinLogin #getSmsCode {
+    right: 0;
+    text-align: center;
+}
+#joinLogin #trackRegister {
+    color: #d09e3d;
+}
+/* 娉ㄥ唽 */
+#register .dialogContent{
+    text-align: left;
+}
+#register .dialogContent h2{
+    text-align: left;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+#register .dialogContent .titleType{
+    display: inline-block;
+    font-size: 24px;
+}
+#register .dialogContent .sp{
+    display: inline-block;
+    float: right;
+}
+#register .inputBox {
+    display: block;
+    margin-bottom: 20px;
+    text-align: left;
+}
+#register .inputBox .dropListSelect{
+    position: absolute;
+    width: 70px;
+    vertical-align: middle;
+    cursor: pointer;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 10px;
+}
+#register .inputBox .dropListSelect dt .spriteIco {
+    position: absolute;
+    right: 12px;
+    top: 15px;
+    width: 14px;
+    height: 11px;
+    background-position: -539px -145px;
+}
+#register .inputBox .dropListSelect dt{
+    position: relative;
+}
+#register .inputBox .dropListSelect dt .ico{
+    position: absolute;
+    right: 12px;
+    top: 16px;
+    width: 12px;
+    height: 6px;
+    background-position: -65px -122px;
+}
+#register .inputBox .dropListSelect dt span{
+    display: block;
+    overflow: hidden;
+    word-break:keep-all;
+    white-space: nowrap;
+    -webkit-text-overflow: ellipsis;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+#register .inputBox .dropListSelect dd{
+    display: none;
+    position: absolute;
+    top: 41px;
+    left: 0;
+    min-width: 100%;
+    min-height: 40px;
+    max-height: 200px;
+    overflow: auto;
+    z-index: 9;
+    overflow-x: hidden;
+    -webkit-transform: scale3d(1,0,1);
+    transform: scale3d(1,0,1);
+    background: #eaecef;
+    -webkit-transform-origin: 50% 0%;
+    transform-origin: 50% 0%;
+    -webkit-transition: -webkit-transform 0.3s;
+    transition: transform 0.3s;
+}
+#register .inputBox .dropListSelect dd:before{
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+#register .inputBox .dropListSelect dd span{
+    display: block;
+    padding:0 15px;
+    height: 35px;
+    line-height: 35px;
+    white-space: nowrap;
+    opacity: 0;
+    background-color: white;
+    -webkit-transform: translate3d(0,-25px,0);
+    transform: translate3d(0,-25px,0);
+    -webkit-transition: opacity 0.15s, -webkit-transform 0.15s;
+    transition: opacity 0.15s, transform 0.15s;
+}
+#register .inputBox .dropListSelect dd span:hover{
+    background-color: #e2ce9e;
+}
+#register .inputBox .dropListSelect.focus{
+    z-index: 100000;
+}
+#register .inputBox .dropListSelect.focus dd{
+    display: block !important;
+    -webkit-transform: scale3d(1,1,1);
+    transform: scale3d(1,1,1);
+    -webkit-transition: none;
+    transition: none;
+    -webkit-animation: expand 0.6s ease-out;
+    animation: expand 0.6s ease-out;
+    margin: 0;
+    padding: 0;
+}
+#register .inputBox .dropListSelect.focus dd span{
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+    opacity: 1;
+    -webkit-transition: none;
+    transition: none;
+    -webkit-animation: bounce 0.6s ease-out;
+    animation: bounce 0.6s ease-out;
+}
+#register .inputBox input{
+    width: 370px;
+}
+#register .inputBox input#account{
+    padding-left: 75px;
+    width: 300px;
+}
+#register .yz-code {
+    cursor: pointer;
+    padding-top: 5px;
+    position: absolute;
+    right: 0;
+    top: -2px;
+}
+#register .yz-code img{
+    margin-right:8px;
+}
+#register .yz-code a{
+    opacity: 0.6;
+    color: #000;
+}
+#register .pic-vf .ico{
+    right: 160px;
+}
+#register .code .ico{
+    right: 160px;
+}
+#register .pic-vf .input, #register .code .input {
+    overflow: hidden;
+    text-align: left;
+    width: 215px;
+}
+#register #getSmsCode {
+    right: 0;
+    text-align: center;
+}
+#register .service a {
+    color: #d09e3d;
+    cursor: pointer;
+    margin-left: 4px;
+}
+#register .button{
+    padding: 0;
+    margin-top: 10px;
+    
+}
+#register .button input{
+    width: 100%;
+    margin: 0;
+}
+#register .loginDiv{
+    margin-top: 10px;
+}
+#register #loginA{
+    color: #d09e3d;
+    cursor: pointer;
+    margin-left: 4px;
+}
+.inputBox span.deleteIco{
+    background-position: -510px -746px;
+    display: inline-block;
+    height: 18px;
+    position: absolute;
+    right: 55px;
+    top: 10px;
+    width: 23px;
+    cursor: pointer;
+}
+.inputBox span.showIco{
+    background-position: -441px -746px;
+    display: inline-block;
+    height: 15px;
+    position: absolute;
+    right: 29px;
+    top: 12px;
+    width: 23px;
+    cursor: pointer;
+}
+.inputBox span.showIco.show{
+    background-position: -473px -747px;
+}
+/*=====鐢ㄦ埛鍗忚寮圭獥===========*/
+
+.service-list{
+    text-align: left;
+    margin-bottom:30px;
+}
+.service-list h4{
+    font-size:18px;
+    margin-bottom:12px;
+}
+.service-list p{
+    line-height: 22px;
+    padding-right:10px;
+    color: #585858;
+}
+.service-list:last-child{
+    margin-bottom:0px;
+}
+.agree-service{
+    width:179px;
+    height: 40px;
+    margin: 0px auto;
+
+}
+.agree-service:hover{
+    opacity: 1;
+}
+
+.other-acount{
+    width: 320px;
+    margin:0 auto;
+}
+.other-acount h4{
+    position: relative;
+    color:#666;
+    text-align: center;
+    margin-bottom:20px;
+}
+.other-acount h4:before{
+    content:"";
+    position: absolute;
+    height:1px;
+    background: #dcdcdc;
+    left:0px;
+    top:10px;
+    width:95px;
+}
+.other-acount h4:after{
+    content:"";
+    position: absolute;
+    height:1px;
+    background: #dcdcdc;
+    right:0px;
+    top:10px;
+    width:95px;
+}
+.acount-list a{
+    display: inline-block;
+    margin-left:32px;
+}
+.acount-list a b{
+    display: inline-block;
+    width: 61px;
+    height: 61px;
+    opacity: .75;
+}
+.acount-list a b:hover{
+    opacity: 1;
+}
+.acount-list a.weixin b{
+    background-position: -104px -279px;
+}
+.acount-list a.sina b{
+    background-position: -171px -280px;
+}
+.acount-list a.qq b{
+    background-position: -238px -281px;
+}
+
+/*璐㈢粡鏄撹矾婕�--寮�璁惧脊妗�*/
+#creationUploader{
+    width: 470px;
+}
+#creationUploader:after{
+    border-radius: 0px;
+}
+#creationUploader .pop-title{
+    color: #213047;
+    font-size: 24px;
+}
+#creationUploader .pop-content .editBox{
+    height: 320px;
+    background-color:rgba(127,127,127,.3);
+    position: relative;
+    text-align: center;
+    vertical-align: middle;
+}
+#creationUploader .pop-content .editBox .img{
+    /*position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%));
+    -moz-transform: translate(-50%,-50%);*/
+    display: inline-block;
+}
+#creationUploader .pop-content .editBox .img img{
+    width: 100%;
+}
+#creationUploader .pop-content .resetCard{
+    text-align: right;
+    height: 40px;
+    line-height: 40px;
+}
+#creationUploader .pop-content .resetCard span{
+    color: #c29037;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+}
+#creationUploader .pop-content .buttonBox{
+    text-align: center;
+    margin-top: 25px;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+#creationUploader .pop-content .buttonBox .btn,#creationUploader .pop-content .buttonBox .confirmDisable{
+    background-color: rgba(255,255,255,0);
+    border:solid 1px #d2d2d2;
+    box-sizing: border-box;
+    color: #cca152;
+    border-radius: 2px;
+    width: 190px;
+}
+#creationUploader .pop-content .buttonBox .confirmDisable{
+    line-height: 40px;
+    height: 40px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    opacity: 0.6;
+}
+#creationUploader .pop-content .buttonBox .btn:hover{
+    background-color: #D09E3D;
+    color: #fff;
+}
+
+/*鏄撹矾婕斾妇鎶�*/
+#report{
+    width: 550px;
+    height: 415px;
+}
+#report .dialogTitle{
+    padding: 35px 25px;
+}
+#report .dialogTitle h2{
+    color: #223047;
+    font-size: 26px;
+}
+#report .reason{
+    margin: 0 auto;
+    width: 280px;
+    width: 300px\0;
+    color: #333333;
+    font-size: 16px;
+    text-align: left;
+}
+#report .reason p{
+    margin-bottom: 25px;
+}
+#report .reason li{
+    margin-bottom: 30px;
+    margin-right: 62px;
+    margin-right: 52px\0;
+    float: left;
+    font-size: 14px;
+    width: 52px;
+    width: 60px\0;
+    cursor: pointer;
+}
+#report .reason li .ico{
+    margin-right: 2px;
+    background-position: -282px -519px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+#report .reason li:hover .ico{
+    background-position: -303px -519px;
+}
+#report .reason li.select .ico{
+    background-position: -323px -519px;
+}
+#report .reason li:nth-child(3),
+#report .reason li:nth-child(5){
+    margin-right: 0;
+}
+#report .reason li:nth-child(5){
+    width: 150px;
+}
+#report .reason li:nth-child(6){
+    margin-bottom: 0;
+    width: 265px;
+}
+#report .reason li .input{
+    margin-top: 15px;
+    width: 245px;
+    height: 15px;
+}
+#report .reason li .phTips{
+    margin-top:15px\0;
+}
+#report .button .btn{
+    width: 188px;
+    height: 38px;
+    line-height: 38px;
+}
+#report .button .close{
+    color: #cca152;
+    border: 1px solid #d2d2d2;
+}
+#report .button .close:hover{
+    border-color: #d0a745;
+}
+#report .button .close:active{
+    border-color: #b79045;
+    color: #b79045;
+}
+#report .button .close:disabled{
+    color: #d3d3d3;
+    border-color: #d3d3d3;
+    cursor: default;
+}
+
+.dialogContent .successIco{
+    background-position:-198px -544px;
+    width:75px;
+    height:75px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+.dialogContent .keyText{
+    color:#db981b;  
+}
+.waitApplyAudit .dialogContent .text{
+    width:420px;
+    font-size:20px;
+}
+.waitApplyAudit .dialogContent .btn{
+    width:330px;
+    margin-top:30px;
+}
+
+#success .dialogContent,#error .dialogContent{
+    position: relative;
+    z-index: 10000;
+    text-align:center;
+    padding-top: 40px;
+    padding-bottom: 20px;
+}
+#success .d-ico,#error .d-ico{
+    background-position: -173px -416px;
+    margin-bottom: 10px;
+    width: 75px;
+    height: 75px;
+    display: inline-block;
+}
+#success .text,#error .text{
+    font-size: 18px;
+    margin: 0;
+    padding: 0 10px;
+    line-height: 24px;
+}
+#error .d-ico{
+    background-position: -248px -417px;
+}

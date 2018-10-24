@@ -13,8 +13,8 @@ from sqlalchemy import create_engine
 # engine = create_engine(r'sqlite:///D:\ProjectSites\db.sqlite3', echo=True) # Using absolute dir
 engine = create_engine(r'sqlite:///db.sqlite3', echo=True)
 # df = pd.read_excel(r'D:\ProjectSites\APP1_LPsplit\appfiles\ITEM_CATEGORY.xlsx')
-df = pd.read_excel(r'APP1_LPsplit/appfiles/ITEM_CATEGORY.xlsx')
-df.to_sql('APP1_LPsplit_ITEM_CATEGORY',engine,if_exists='replace',index=False)
+df = pd.read_excel(r'APP1_LP/appfiles/ITEM_CATEGORY.xlsx')
+df.to_sql('APP1_LP_ITEM_CATEGORY',engine,if_exists='replace',index=False)
 
 # Generate a df of fake data
 hislen=1000
@@ -22,7 +22,7 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
 engine = create_engine(r'sqlite:///db.sqlite3', echo=True)
-ITEM_CATEGORY = pd.read_sql('SELECT * FROM APP1_LPsplit_ITEM_CATEGORY',engine)
+ITEM_CATEGORY = pd.read_sql('SELECT * FROM APP1_LP_ITEM_CATEGORY',engine)
 Items = ITEM_CATEGORY.ITEM.to_dict()
 # NO. ITEM, QTY generate independently, maximum NO.=hislen/5
 hisrand = pd.DataFrame()
@@ -31,4 +31,4 @@ hisrand['ITEM'] = np.random.randint(0,high=len(Items),size=hislen)
 hisrand['ITEM'] = hisrand['ITEM'].map(Items)
 hisrand['QTY'] = np.random.randint(1,high=6,size=hislen)
 hisrand = hisrand.sort_values(by=['NO.','ITEM'])
-hisrand.to_sql('APP1_LPsplit_HISRAND',engine,if_exists='replace',index=False)
+hisrand.to_sql('APP1_LP_HISRAND',engine,if_exists='replace',index=False)

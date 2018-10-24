@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
+
+        <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+    </head>
+
+    <body>
+        <!-- heading-->
+        <div class="section-heading">
+        <div class="section-title">Random Generate KFC Plan</div>
+        <div class="section-line"></div>
+        <div class="section-subtitle">LP problem with PULP</div>
+    </div>
+    <!-- heading-->
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <form action="Recommend/" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <p>Choose a staple:</p>
+                    <div class="form-group">
+                        <div class="form-inline">
+                            <label for="Staple" style="width:100px">Staple:</label>
+                            <select id="Staple" name="Staple" class="form-control" style="width:200px" onchange="selectOnchang(this)">    
+                                <option value="">No idea</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-inline">
+                            <label for="StaplePrice" style="width:100px">Staple price:</label>
+                            <select id="StaplePrice" name="StaplePrice" class="form-control" style="width:200px" onchange="selectOnchang(this)">    
+                                <option value="">0</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p>Max total pay:</p>
+                    <div class="form-group">
+                        <div class="form-inline">
+                            <label for="TTPay" style="width:100px">Yuan(￥):</label>
+                            <input id="TTPay" name="TTPay" type="text" class="form-control" placeholder="50" value="50" style="width:200px" onkeyup="filtration(this,event,/\D/g);">
+                        </div>
+                    </div>                     
+                    <div>
+                        <label>
+                            <input id="pack" name="pack" type="checkbox">take out
+                        </label>
+                        <button type="button" class="btn btn-primary">generate</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Total price:<span id="TTPRICE" style="color: #f0214d"></span></div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th width="200px">Item</th>
+                                <th>Describe</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultTB">                           
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Django ajax csrf protection setup
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+            });
+        
+            // Find specific value in array
+            function inArray1(needle,array,bool){
+                if(typeof needle=="string"||typeof needle=="number"){
+                    for(var i in array){
+                        if(needle===array[i]){
+                            if(bool){
+                                return i;
+                            }
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+            
+            // Selection Variables
+            var selectValAll = {};
+            function selectOnchang(obj){
+                var value = obj.options[obj.selectedIndex].value;
+                var name = $(obj).attr("name");
+                selectValAll[name] = value;
+            }
+
+            // Verify price to be number
+            function filtration(obj,e,reg){
+                if(!inArray1(e.which,[37,38,39,40,8]) && reg.test(obj.value) ){
+                    var _lenght = 0;
+                    $(obj).val(obj.value.replace(reg,function(e,index){
+                        _lenght = index;
+                        return '';
+                    }));
+                }
+            }
+
+            $(function () {               
+                // Get all staples
+                $.get('/APP1/Staple',function (dic) {
+                    $.each(dic.data,function (index, item) {
+                        $('#Staple').append('<option value="'+item.id+'">'+item.name+'</option>')
+                    })
+                })
+
+                // Get all stapleprices
+                $.get('/APP1/Price',function (dic) {
+                    $.each(dic.data,function (index, item) {
+                        $('#StaplePrice').append('<option value="'+item.id+'">'+item.name+'</option>')
+                    })
+                })
+
+                // When staple selected, change the price
+                $('#Staple').change(function () {
+                    if(parseInt($(this).val()) >= 0){
+                        $.get('/APP1/StapleSelected'+$(this).val()+'/',function (dic) {
+                            $.each(dic.data,function (index, item) {
+                                $('#StaplePrice').empty().append('<option value="'+item.id+'">'+item.name+'</option>')
+                            })
+                            $('#StaplePrice').setAttribute('disabled','true');
+                        })
+                    }else{
+                        ajaxInfo();
+                    }
+                })
+
+                // When price selected, change the staple
+                $('#StaplePrice').change(function () {
+                    $('#Staple').empty().append('<option> choose staple </option>')
+                    if(parseInt($(this).val()) >= 0){
+                        $.get('/APP1/PriceSelected'+$(this).val()+'/',function (dic) {
+                            $.each(dic.data,function (index, item) {
+                                $('#Staple').append('<option value="'+item.id+'">'+item.name+'</option>')
+                            })
+                        })
+                    }else{
+                        ajaxInfo();
+                    }
+                })
+                
+                // Recommand caculation
+                $("form .btn-primary").click(function(){
+                    selectValAll.TTPay = $("form .form-control[name=TTPay]").val();
+
+                    if($("form input[name=pack]").is(":checked")){
+                        selectValAll.pack = 1;
+                    }else{
+                        selectValAll.pack = 0;
+                    }
+
+                    $.post("Recommend/",selectValAll,function(data){
+                        if(data && data.length > 0){
+                            var data = JSON.parse(data);
+                            if(data.Html_Status == "OK"){
+                                createTr(data);
+                            }
+                            else if(data.Html_Status == "FAIL"){
+                            }
+                        }
+                    })
+                })
+
+                // Add table function
+                var recordTitle = "";
+                function addTr(obj,title){
+                    if(obj){
+                        if(recordTitle != title){
+                            var trFirst = '<tr style="background-color:#44aff726"><td colspan="4">'+title+'</td></tr>';
+                            $("#resultTB").append(trFirst);
+                            recordTitle = title;
+                        }
+                        var tr = '<tr><td>'+obj.ITEM+'</td><td>'+obj.ITEM_DESCRIPTION+'</td><td>'+obj.Qty+'</td><td>'+obj.PRICE+'</td></tr>';
+                        $("#resultTB").append(tr);
+                    }
+                }
+
+                // Load data to table
+                function createTr(data){
+                    $("#resultTB").empty();                    
+                    var summary = data.Html_Recommend_SUMMARY;
+                    var conf = data.Html_Recommend_CONF;
+                    if(conf){
+                        conf = JSON.parse(conf);
+                        for(var i=0;i<conf.length;i++){
+                            addTr(conf[i],conf[i].ITEM_CATEGORY);
+                        }
+                    }
+                    
+                    // Price
+                    if(summary){
+                        $("#TTPRICE").text((summary.TTPay).toFixed(2));
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -18,7 +18,7 @@ from django.urls import include,path
 
 urlpatterns = [
     path('APP2/',include('APP2_Comparison.urls', namespace='APP2')),
-    path('APP1/',include('APP1_LPsplit.urls', namespace='APP1')),
+    path('APP1/',include('APP1_LP.urls', namespace='APP1')),
     path('',include('APP0_Homepage.urls', namespace='APP0')),
     path('admin/', admin.site.urls),
 ]

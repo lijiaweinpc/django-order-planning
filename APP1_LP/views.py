@@ -8,26 +8,48 @@ import pulp
 import json
 # Get product df ITEM_CATEGORY
 engine = create_engine('sqlite:///db.sqlite3', echo=True)
-ITEM_CATEGORY = pd.read_sql("SELECT * FROM APP1_LPsplit_ITEM_CATEGORY",engine).fillna('')
+ITEM_CATEGORY = pd.read_sql("SELECT * FROM APP1_LP_ITEM_CATEGORY",engine).fillna('')
 
 def Index(request):
-    return render(request,'APP1_LPsplit/index.html')
+    return render(request,'APP1_LP/index.html')
 
 def Staple(request):
     # Give all staple directly for choose
-    Staple = ITEM_CATEGORY[ITEM_CATEGORY['ITEM_CATEGORY']=='Staple']  
+    Staple = ITEM_CATEGORY[ITEM_CATEGORY['ITEM_CATEGORY']=='Staple'] 
     list = []
     for index in Staple.index:
-        list.append({'id':str(index),'name':str(Staple.loc[index,'ITEM_DESCRIPTION'])})
+        list.append({'id':str(index),'name':str(Staple.loc[index,'ITEM_DESCRIPTION'])})   
+    return JsonResponse({'data':list})
+
+def Price(request):
+    # Give all price.dropduplicates directly for choose
+    Price = pd.DataFrame(ITEM_CATEGORY[ITEM_CATEGORY['ITEM_CATEGORY']=='Staple']['PRICE'].drop_duplicates().sort_values())
+    list = []
+    for index in Price.index:
+        list.append({'id':str(index),'name':str(Price.loc[index,'PRICE'])})
     return JsonResponse({'data':list})
 
 def StapleSelected(request,id):
-    # When cilcking on a staple, show the price
-    ITEM = ITEM_CATEGORY.loc[int(id),'ITEM']
-    PRICE = ITEM_CATEGORY.loc[int(id),'PRICE']
+    # When cilcking on a staple, get the price
+    Price = ITEM_CATEGORY.loc[int(id),'PRICE']
     list = []
-    list.append({'ITEM_ID':str(ITEM),'ITEM_NAME':str(ITEM),'PRICE_ID':str(PRICE),'PRICE_NAME':str(PRICE)})
+    list.append({'id':str(Price),'name':str(Price)})
     return JsonResponse({'data':list})
+
+def PriceSelected(request,id):
+    # When cilcking on a price, get the stape
+    Price = ITEM_CATEGORY.loc[int(id),'PRICE']
+    Staple = ITEM_CATEGORY[(ITEM_CATEGORY['ITEM_CATEGORY']=='Staple') & (ITEM_CATEGORY['PRICE']==Price)]
+    list = []
+    for index in Staple.index:
+        list.append({'id':str(index),'name':str(Staple.loc[index,'ITEM_DESCRIPTION'])})  
+    return JsonResponse({'data':list})
+
+def StapleRecommand(index):
+    # Select the staple must have
+    STAPLE_RECOMMEND = pd.DataFrame(columns=['ITEM_CATEGORY','ITEM','ITEM_DESCRIPTION','Qty','PRICE'])
+    STAPLE_RECOMMEND.loc[0] = [ITEM_CATEGORY.loc[index,'ITEM_CATEGORY'],ITEM_CATEGORY.loc[index,'ITEM'],ITEM_CATEGORY.loc[index,'ITEM_DESCRIPTION'],1,ITEM_CATEGORY.loc[index,'PRICE']]
+    return STAPLE_RECOMMEND
 
 def RandRecommand(TTPay):
     # Main recommand function
@@ -58,23 +80,34 @@ def RandRecommand(TTPay):
             RAND_RECOMMAND_INDEX += 1
         else:
             pass
+    RAND_RECOMMAND=RAND_RECOMMAND.sort_values(by=['ITEM_CATEGORY','ITEM'])
     return RAND_RECOMMAND
 
 def Recommend(request):  
     Staple = ''
-    TTPay = '' 
+    TTPay = ''
+    pack = '' 
 
     # Get request
     if request.POST:
         Staple = request.POST.get('Staple')
         TTPay = request.POST.get('TTPay')
+        pack = request.POST.get('pack')
     
-    Recommend_CONF = pd.DataFrame()
+    Recommend_CONF = pd.DataFrame(columns=['ITEM_CATEGORY','ITEM','ITEM_DESCRIPTION','Qty','PRICE'])
     Recommend_SUMMARY = {'TTPay':0}
+
+    # if need packm, add at first
+    if pack == '1':
+        Recommend_CONF.loc[len(Recommend_CONF)]=['Others','pack','package cost',1,1.5]
+        TTPay = float(TTPay)-1.5
+
     # Get selected staple
     if Staple!= '' and Staple!= None:
-        STAPLE_RECOMMEND = StapleRecommand(int(Staple),1)
+        STAPLE_RECOMMEND = StapleRecommand(int(Staple))
         Recommend_CONF = pd.concat([Recommend_CONF,STAPLE_RECOMMEND])
+        TTPay = float(TTPay)-float(STAPLE_RECOMMEND.loc[0,'PRICE'])
+
     # Rand recommend with price limination
     if TTPay!= '' and TTPay!=None:
         RAND_RECOMMAND = RandRecommand(int(TTPay))

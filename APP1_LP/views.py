@@ -59,7 +59,6 @@ def RandRecommand(TTPay):
     ITEM_CATEGORY_T = ITEM_CATEGORY[ITEM_CATEGORY['ITEM_CATEGORY']!='Staple'].sample(frac=0.5)
     model = pulp.LpProblem("Rand Food", pulp.LpMinimize)
     var = {}
-    aim = ''
     TTPRICE = ''
     TTNums = ''
     for index in ITEM_CATEGORY_T.index:

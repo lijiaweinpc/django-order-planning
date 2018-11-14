@@ -11,16 +11,16 @@ import pandas as pd
 import openpyxl  
 def EXCELconvert(filepath,productlist):
         wb = openpyxl.load_workbook(filepath)    
-        #获取workbook中所有的表格  
+        # 获取workbook中所有的表格  
         sheets = wb.get_sheet_names()
-        collect = pd.DataFrame(columns=['名称','编码','数量','filename'])
+        collect = pd.DataFrame(columns=['Name','Item','Qty','filename'])
         index_collect=0
         statuscode=0
         for st in sheets:
                 if st in productlist:
                         ws = wb.get_sheet_by_name(st)
                         df = pd.DataFrame(ws.values)
-                        #定位'No.'的位置
+                        # 定位'No.'的位置
                         for indexcol in range(df.columns.size):
                                 if 'No.' in df[indexcol].tolist():
                                         headraw=df[df[indexcol]=='No.'].index
@@ -28,11 +28,11 @@ def EXCELconvert(filepath,productlist):
                                 elif '序号' in df[indexcol].tolist():
                                         headraw=df[df[indexcol]=='序号'].index
                                         break
-                        #删除表外的行和列
+                        # 删除表外的行和列
                         df=df.drop(list(range(headraw[0])))
                         df=df.drop(list(range(indexcol)),axis=1)
                         df=df.reset_index(drop=True).fillna('')
-                        #定位数量列
+                        # 定位数量列
                         itemnumcol=[]
                         itemnumcolname=[]
                         for col in df.columns:

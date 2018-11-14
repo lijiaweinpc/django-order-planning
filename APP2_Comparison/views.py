@@ -66,9 +66,8 @@ def uploads(request):
         HTML['All_files']={'status_detail':'您所上传的文件中没有找到流水单。'}
         return JsonResponse(json.dumps(HTML),safe=False)     
 
-
-    #准备比对的对象，sql hot_repo并准备宽表
-    sql_hot="SELECT * FROM PCI_Hot where"
+    #准备比对的对象，sql hotconf并准备宽表
+    sql_hot="SELECT * FROM APP2_HotConf where"
     for repo in repolist:
         sql_hot+=" Repo=='"+repo+"' or"
     sql_hot=sql_hot[:-3]

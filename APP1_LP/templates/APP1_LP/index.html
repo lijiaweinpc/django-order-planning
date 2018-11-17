@@ -16,64 +16,66 @@
         <div class="section-title">Random Generate KFC Plan</div>
         <div class="section-line"></div>
         <div class="section-subtitle">LP problem with PULP</div>
-    </div>
-    <!-- heading-->
+        </div>
+        <!-- heading-->
     
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <form action="Recommend/" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <p>Choose a staple:</p>
-                    <div class="form-group">
-                        <div class="form-inline">
-                            <label for="Staple" style="width:100px">Staple:</label>
-                            <select id="Staple" name="Staple" class="form-control" style="width:200px" onchange="selectOnchang(this)">    
-                                <option value="">No idea</option>
-                            </select>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <form action="Recommend/" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <p>Choose a staple:</p>
+                        <div class="form-group">
+                            <div class="form-inline">
+                                <label for="Staple" style="width:100px">Staple:</label>
+                                <select id="Staple" name="Staple" class="form-control" style="width:200px" onchange="selectOnchang(this)">    
+                                    <option value="">No idea</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="form-inline">
-                            <label for="StaplePrice" style="width:100px">Staple price:</label>
-                            <select id="StaplePrice" name="StaplePrice" class="form-control" style="width:200px" onchange="selectOnchang(this)">    
-                                <option value="">0</option>
-                            </select>
+                        <div class="form-group">
+                            <div class="form-inline">
+                                <label for="StaplePrice" style="width:100px">Staple price:</label>
+                                <select id="StaplePrice" name="StaplePrice" class="form-control" style="width:200px" onchange="selectOnchang(this)">    
+                                    <option value="">0</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <p>Max total pay:</p>
-                    <div class="form-group">
-                        <div class="form-inline">
-                            <label for="TTPay" style="width:100px">Yuan(￥):</label>
-                            <input id="TTPay" name="TTPay" type="text" class="form-control" placeholder="50" value="50" style="width:200px" onkeyup="filtration(this,event,/\D/g);">
+                        <p>Max total pay:</p>
+                        <div class="form-group">
+                            <div class="form-inline">
+                                <label for="TTPay" style="width:100px">Yuan(￥):</label>
+                                <input id="TTPay" name="TTPay" type="text" class="form-control" placeholder="50" value="50" style="width:200px" onkeyup="filtration(this,event,/\D/g);">
+                            </div>
+                        </div>                     
+                        <div>
+                            <label>
+                                <input id="pack" name="pack" type="checkbox">take out
+                            </label>
+                            <button type="button" class="btn btn-primary">generate</button>
                         </div>
-                    </div>                     
-                    <div>
-                        <label>
-                            <input id="pack" name="pack" type="checkbox">take out
-                        </label>
-                        <button type="button" class="btn btn-primary">generate</button>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Total price:<span id="TTPRICE" style="color: #f0214d"></span></div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="200px">Item</th>
+                                    <th>Describe</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTB">                           
+                            </tbody>
+                        </table>
                     </div>
-                </form>
-            </div>
-            <div class="col-md-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Total price:<span id="TTPRICE" style="color: #f0214d"></span></div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th width="200px">Item</th>
-                                <th>Describe</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultTB">                           
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
+
 
         <script>
             // Django ajax csrf protection setup

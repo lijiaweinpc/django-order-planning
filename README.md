@@ -4,3 +4,4 @@
 Django -2.0.5
 python -3.6.4
 conda -4.5.0
+pulp -2.6.0

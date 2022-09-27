@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class App1LpsplitConfig(AppConfig):
-    name = 'APP1_LPsplit'
+class App1LpConfig(AppConfig):
+    name = 'APP1_LP'

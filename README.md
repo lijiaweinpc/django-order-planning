@@ -1,6 +1,6 @@
 ## 项目介绍
 Django搭建的一个半成品网站，方便学习和快速建站。内含一个随机点单的app，用户输入资金上限，即可通过线性规划生成满足要求的具体点单菜品组合~
-![](https://github.com/lijiaweinpc/django-order-planning/blob/master/static/showcase.gif)
+![](https://lijiaweinpc.github.io/static/%E7%94%B1%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90gif/showcase.gif)
 
 ## 项目优势
 - 功能简洁单一，模块划分清楚，方便了解和学习django的MVC结构，路由系统等；方便基于此结构进行二次开发。
